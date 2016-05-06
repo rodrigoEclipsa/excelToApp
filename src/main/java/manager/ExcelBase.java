@@ -6,7 +6,6 @@ package manager;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
 
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -40,7 +39,7 @@ public class ExcelBase
 	 * se necesitan almacenar para poder notificar los
 	 * cambios en modificaciones posteriores
 	 */
-	private Map<String,Boolean> changedCells;
+//	private Map<String,Boolean> changedCells;
 
 
     
@@ -76,53 +75,52 @@ public class ExcelBase
 		
 	}
 
-	public void setCellValue(String cellName, double value)
-	{
+	
 
-		CellReference cellReference = new CellReference(cellName);
-
-		Row row = sheet.getRow(cellReference.getRow());
-
-		Cell cell = row.getCell(cellReference.getCol());
-
-		if (cell.getCellType() == HSSFCell.CELL_TYPE_FORMULA)
+		
+		public void setCellValue(String cellName, String value,boolean notifyUpdate)
 		{
 			
-		//	System.out.println("cell : " + cellName);
-		//	System.out.println("value : " + cellName);
+			Cell cell = getCellByCoordinate(cellName);
+
+			//si es una formula cambio el tipo de celda para setear un numero
+			//es el caso de las celdas mixtas que pueden ser formula o un valor ingresado por el usuario
+			if (cell.getCellType() == HSSFCell.CELL_TYPE_FORMULA)
+			{
+				
+			//	System.out.println("cell : " + cellName);
+			//	System.out.println("value : " + cellName);
+				
+				cell.setCellType(HSSFCell.CELL_TYPE_STRING);
+			}
+		
 			
-			cell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
-		}
-		
-		
-		if(changedCells.containsKey(cellName))
-		{
+			if(notifyUpdate)
+			{
+				this.notifyUpdateCell(cell);
+				
+			}
 			
-			changedCells.put(cellName, true);
+			
+			
+			
+			cell.setCellValue(value);
+			
+			
 		}
-		else
-		{
-			//si es la primera ves que se pide esta celda
-			changedCells.put(cellName, false);
-		}
-
 		
-		
-		
-		cell.setCellValue(value);
 
-	}
-
-	public String getFormatString(String cellCordinate)
+	
+	
+	
+	
+	public String getFormatString(String cellName)
 	{
 
 		String result;
 
-		CellReference cellReference = new CellReference(cellCordinate);
-
-		Row row = sheet.getRow(cellReference.getRow());
-
-		Cell cell = row.getCell(cellReference.getCol());
+	
+		Cell cell = getCellByCoordinate(cellName);
 
 		result = cell.getCellStyle().getDataFormatString();
 
@@ -140,7 +138,7 @@ public class ExcelBase
 		CellValue cellValue = new CellValue();
 	
 		
-		
+	
 	
 		if(cell != null)
 		{
@@ -227,31 +225,9 @@ public class ExcelBase
 	public CellValue getCellValue(String cellName) 
 	{
 
-		
-		
-		
-		CellReference cellReference = new CellReference(cellName);
-
-		Row row = sheet.getRow(cellReference.getRow());
-
-		Cell cell = row.getCell(cellReference.getCol());
-
-
 	
+		Cell cell = getCellByCoordinate(cellName);
 
-		if(changedCells.containsKey(cellName))
-		{
-			if(changedCells.get(cellName))
-			{
-				changedCells.put(cellName,false);
-				notifyUpdateCell(cellName);
-				
-			}
-			
-		}
-		
-		
-		
 		return getCellValue(cell);
 		
 	
@@ -325,11 +301,9 @@ public class ExcelBase
 	public void notifyUpdateCell(String cellName)
 	{
 
-		CellReference cellReference = new CellReference(cellName);
+		
 
-		Row row = sheet.getRow(cellReference.getRow());
-
-		Cell cell = row.getCell(cellReference.getCol());
+		Cell cell = getCellByCoordinate(cellName);
 
 		evaluator.notifyUpdateCell(cell);
 
@@ -367,7 +341,19 @@ public class ExcelBase
 	
 	
 	
+	public Cell getCellByCoordinate(String cellName)
+	{
+		
 	
+		CellReference cellReference = new CellReference(cellName);
+
+		Row row = sheet.getRow(cellReference.getRow());
+
+		Cell cell = row.getCell(cellReference.getCol());
+		
+		return cell;
+		
+	}
 	
 
 	public boolean isNumeric(String s)

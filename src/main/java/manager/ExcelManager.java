@@ -15,7 +15,9 @@ public class ExcelManager extends ExcelBase
 {
 
 	private JSONObject sentData;
-	private JSONObject resultData;
+	public JSONObject resultData = new JSONObject();
+
+
 
 	private int processStadge = 0;
 
@@ -30,81 +32,78 @@ public class ExcelManager extends ExcelBase
 
 	}
 
-	/**
-	 * 
-	 * carga una celda a cellresult
-	 * 
-	 * @param cellName
-	 */
-	private void getCellResult(String cellName)
-	{
-		// System.out.println(cellName);
-
-		// ResultsentCells.put(cellName, getCellJSONValue(cellName));
-
-	}
-
-	/**
-	 * 
-	 * agrega una celda con un alias, para calcular tablas dinamicas
-	 * 
-	 * 
-	 * @param cellName
-	 * @param asCell
-	 *            : alias de celda
-	 */
-
-	private void getCellResult(String cellName, String asCell)
-	{
-
-		// ResultsentCells.put(asCell, getCellJSONValue(cellName));
-
-	}
-
+	
 	/**
 	 * 
 	 * setea todas las celdas variables enviadas por el cliente
 	 * 
 	 */
-	private void setCalculableVar(JSONObject calculableVar) throws Exception
+	private void setCalculableVar(JSONObject calculableVar,boolean notifyUpdateAll) 
 	{
 
 		for (Object cellKey : calculableVar.keySet())
 		{
 
-			// System.out.println("se modifica : "+ cellKey.toString());
-
 			String valueCell = calculableVar.get(cellKey).toString();
 
-			String cellExcelFormat = this.getFormatString(cellKey.toString());
+			setCalculableVar(cellKey.toString(),valueCell,notifyUpdateAll);
+			
+		}
 
-			// System.out.println(cellKey.toString()+"\n");
+	}
+	
+	
+	private void setCalculableVar(String cellName,String valueCell,boolean notifyUpdateAll) 
+	{
 
-			// System.out.println(sentCells.get(cellKey).toString()+"\n");
+		// System.out.println("se modifica : "+ cellKey.toString());
 
-			// System.out.println(cellExcelFormat+"\n");
+	
+		String cellExcelFormat = this.getFormatString(cellName);
 
-			// si la celda es pocentaje divido por 100
-			if (cellExcelFormat.contains("%")
-					&& isNumeric(calculableVar.get(cellKey).toString()))
-			{
+		// System.out.println(cellKey.toString()+"\n");
 
-				this.setCellValue(cellKey.toString(),
-						Double.parseDouble(valueCell) / 100);
+		// System.out.println(sentCells.get(cellKey).toString()+"\n");
 
-			} else
-			{
+		// System.out.println(cellExcelFormat+"\n");
 
-				this.setCellValue(cellKey.toString(),
-						Double.parseDouble(valueCell));
+		// si la celda es pocentaje divido por 100
+		
+		Double calculateAux;
+		
+		if (cellExcelFormat.contains("%")
+				&& isNumeric(valueCell))
+		{
 
-			}
+			calculateAux = Double.parseDouble(valueCell) / 100;
+			this.setCellValue(cellName,
+					calculateAux.toString(),notifyUpdateAll);
 
+		} 
+		else if(isNumeric(valueCell))
+		{
+
+			calculateAux = Double.parseDouble(valueCell);
+			
+			this.setCellValue(cellName,
+					calculateAux.toString(),notifyUpdateAll);
+
+		}
+		else
+		{
+			//es un string, en un futuro se agregara soporte de fechas
+			
+			this.setCellValue(cellName,
+					valueCell,notifyUpdateAll);
 		}
 
 	}
 
-	private JSONObject getResultDataTable()
+	
+	
+	
+
+	private JSONObject getResultDataTable() 
 	{
 
 		JSONObject calculateResult = new JSONObject();
@@ -112,13 +111,49 @@ public class ExcelManager extends ExcelBase
 		JSONObject dataTable = (JSONObject) sentData.get("dataTable");
 		
 		String evaluateFormula = (String)dataTable.get("evaluateFormula");
-		String input0 = (String)dataTable.get("input0");
-		String input1 = (String)dataTable.get("input1");
+		String cellInput0 = (String)dataTable.get("cellInput0");
+		String cellInput1 = (String)dataTable.get("cellInput1");
+		
+		JSONArray calculableVar = (JSONArray)dataTable.get("calculableVar");
 		
 		//String evaluateFormula = (String)dataTable.get("evaluateFormula");
 		
 		
 		//notifyUpdateCell(cellName);
+		
+		
+		for (Object calculableVarItem : calculableVar)
+		{
+			
+			JSONObject calculableVarItemObj = (JSONObject) calculableVarItem;
+			
+			
+			
+			if(calculableVarItemObj.containsKey("input0"))
+			{
+			
+				
+				setCalculableVar(cellInput0,
+						calculableVarItemObj.get("input0").toString() , 
+						true);
+			}
+			
+			
+			if(calculableVarItemObj.containsKey("input1"))
+			{
+			
+				setCalculableVar(cellInput1,
+						calculableVarItemObj.get("input1").toString(), 
+						true);
+			}
+			
+			
+			calculateResult.put((String)calculableVarItemObj.get("setResult")
+					, getCellValue(evaluateFormula).value);
+			
+			
+		}
+		
 		
 		
 		return calculateResult;
@@ -135,7 +170,7 @@ public class ExcelManager extends ExcelBase
 	 * @return
 	 * @throws Exception
 	 */
-	private JSONArray getResultDinamicComponent() throws Exception
+	private JSONArray getResultDinamicComponent() 
 	{
 
 		JSONArray calculateResult = new JSONArray();
@@ -157,8 +192,10 @@ public class ExcelManager extends ExcelBase
 		for (Object calculableVarItem : calculableVar)
 		{
 
-			setCalculableVar((JSONObject) calculableVarItem);
+			setCalculableVar((JSONObject) calculableVarItem,true);
 
+			
+			
 			getResult = getResult(requestResult);
 
 			
@@ -183,7 +220,7 @@ public class ExcelManager extends ExcelBase
 							
 							String cellNameGen = mapResultColumnKey.toString()+indicateRowMap.toString();
 									
-							setCellValue(cellNameGen, (Double)getResult.get(getResultKey));
+							setCalculableVar(cellNameGen, getResult.get(getResultKey).toString(),false);
 							
 							continue;
 							
@@ -208,9 +245,11 @@ public class ExcelManager extends ExcelBase
 	 * recibe un array de celdas para calcular y obtener
 	 * 
 	 * @param requestResult
+	 * @param notifyAll
+	 * si es true se notifican cambios en todas las celdas
 	 * @return
 	 */
-	private JSONObject getResult(JSONArray requestResult) throws Exception
+	private JSONObject getResult(JSONArray requestResult) 
 	{
 
 		JSONObject calculateResult = new JSONObject();
@@ -219,10 +258,14 @@ public class ExcelManager extends ExcelBase
 		for (Object requestResultItem : requestResult)
 		{
 
+			
+			
 			CellValue cellValue = this.getCellValue((String) requestResultItem);
 
 			calculateResult.put(requestResultItem, cellValue.value);
 
+			System.out.println(requestResultItem.toString() + " : " + cellValue.value);
+			
 		}
 
 		return calculateResult;
@@ -232,11 +275,11 @@ public class ExcelManager extends ExcelBase
 	/**
 	 * 
 	 * proceso de calculo 
-	 * 0- se resuelven los componentes dinamicos 
-	 * 1- se resulve las tablas de datos
-	 * 2- se setean las variables 
-	 * 3- se obtienen los resultados 
 	 * 
+	 * 1- se setean las variables 
+	 * 2- se obtienen los resultados 
+	 * 3- se resulve las tablas de datos
+	 * 4- se resuelven los componentes dinamicos 
 	 * 
 	 * 
 	 * 
@@ -245,12 +288,34 @@ public class ExcelManager extends ExcelBase
 	public void calculate() throws Exception
 	{
 
-		System.out.println("iniciando proceso de calculo...");
+		System.out.println("proceso de calculo etapa..." + processStadge);
 
 		switch (processStadge)
 		{
 
+		
 		case 0:
+
+			JSONObject calculableVar = (JSONObject) sentData
+					.get("calculableVar");
+			
+			setCalculableVar(calculableVar,false);
+
+			nextProcess();
+
+			break;
+
+		case 1:
+			
+			JSONArray requestResult = (JSONArray) sentData.get("requestResult");
+			resultData.put("calculateResult", getResult(requestResult));
+
+			nextProcess();
+			break;
+			
+		
+		
+		case 2:
 
 			if (sentData.containsKey("nInstances"))
 			{
@@ -263,38 +328,30 @@ public class ExcelManager extends ExcelBase
 			}
 
 			nextProcess();
+			
 			break;
 			
-		case 1:
+		case 3:
 			
 			if(sentData.containsKey("dataTable"))
 			{
-			getResultDataTable();
+				
+				JSONObject dataTable = new JSONObject();
+				
+				dataTable.put("calculateResult",getResultDataTable());
+				
+			
+			
 			
 			}
+			
+			
 			nextProcess();
 			
 		 break;
 
 
-		case 2:
-
-			JSONObject calculableVar = (JSONObject) sentData
-					.get("calculableVar");
-			
-			setCalculableVar(calculableVar);
-
-			nextProcess();
-
-			break;
-
-		case 3:
-			JSONArray requestResult = (JSONArray) sentData.get("requestResult");
-			resultData.put("calculateResult", getResult(requestResult));
-
-			nextProcess();
-			break;
-			
+	
 			
 		case 4:
 			System.out.println("fin de proceso de calculo");
@@ -326,491 +383,6 @@ public class ExcelManager extends ExcelBase
 		calculate();
 	}
 
-	/*
-	 * private void getData_feedlootPorcentual() {
-	 * 
-	 * getCellResult("e11"); getCellResult("e13");
-	 * 
-	 * getCellResult("e17");
-	 * 
-	 * getCellResult("m13"); getCellResult("m15"); getCellResult("m17");
-	 * getCellResult("e22");
-	 * 
-	 * getCellResult("g24");
-	 * 
-	 * getCellResult("e28"); getCellResult("g28");
-	 * 
-	 * getCellResult("g30");
-	 * 
-	 * getCellResult("g32"); getCellResult("e34"); getCellResult("m22");
-	 * getCellResult("o22");
-	 * 
-	 * getCellResult("o24");
-	 * 
-	 * getCellResult("m28"); getCellResult("o28");
-	 * 
-	 * getCellResult("o30");
-	 * 
-	 * getCellResult("o34"); getCellResult("k38"); getCellResult("k41");
-	 * getCellResult("k44");
-	 * 
-	 * getCellResult("g11");
-	 * 
-	 * getCellResult("c38");
-	 * 
-	 * getCellResult("c41"); getCellResult("c44");
-	 * 
-	 * getCellResult("o22");
-	 * 
-	 * getCellResult("e26");
-	 * 
-	 * getCellResult("g26");
-	 * 
-	 * getCellResult("b1");
-	 * 
-	 * getCellResult("b1");
-	 * 
-	 * //getCellResult("k48"); getCellResult("k50"); getCellResult("k52");
-	 * getCellResult("k54");
-	 * 
-	 * getCellResult("n48"); getCellResult("n50"); getCellResult("n52");
-	 * getCellResult("n54");
-	 * 
-	 * 
-	 * getCellResult("t81"); getCellResult("t82"); getCellResult("t83");
-	 * getCellResult("t85"); getCellResult("t86"); getCellResult("t87");
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * // ------------------------------------------------------resuelvo //
-	 * valores de tabla dinamica // ---------------------------------------tabla
-	 * 1
-	 * 
-	 * // ------------------320
-	 * 
-	 * setCellValue("e9", Double.parseDouble(sentCells.get("t69").toString()));
-	 * notifyUpdateCell("e9");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("u68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "u69");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("v68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "v69");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("w68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "w69");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("x68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "x69");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("y68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "y69");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("z68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "z69");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("aa68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "aa69");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("ab68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "ab69");
-	 * 
-	 * // --------------340
-	 * 
-	 * setCellValue("e9", Double.parseDouble(sentCells.get("t70").toString()));
-	 * notifyUpdateCell("e9");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("u68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "u70");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("v68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "v70");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("w68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "w70");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("x68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "x70");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("y68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "y70");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("z68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "z70");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("aa68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "aa70");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("ab68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "ab70");
-	 * 
-	 * // --------------360
-	 * 
-	 * setCellValue("e9", Double.parseDouble(sentCells.get("t71").toString()));
-	 * notifyUpdateCell("e9");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("u68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "u71");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("v68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "v71");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("w68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "w71");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("x68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "x71");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("y68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "y71");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("z68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "z71");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("aa68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "aa71");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("ab68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "ab71");
-	 * 
-	 * // --------------380
-	 * 
-	 * setCellValue("e9", Double.parseDouble(sentCells.get("t72").toString()));
-	 * notifyUpdateCell("e9");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("u68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "u72");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("v68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "v72");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("w68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "w72");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("x68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "x72");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("y68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "y72");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("z68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "z72");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("aa68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "aa72");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("ab68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "ab72");
-	 * 
-	 * // --------------400
-	 * 
-	 * setCellValue("e9", Double.parseDouble(sentCells.get("t73").toString()));
-	 * notifyUpdateCell("e9");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("u68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "u73");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("v68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "v73");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("w68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "w73");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("x68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "x73");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("y68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "y73");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("z68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "z73");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("aa68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "aa73");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("ab68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "ab73");
-	 * 
-	 * // --------------420
-	 * 
-	 * setCellValue("e9", Double.parseDouble(sentCells.get("t74").toString()));
-	 * notifyUpdateCell("e9");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("u68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "u74");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("v68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "v74");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("w68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "w74");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("x68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "x74");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("y68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "y74");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("z68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "z74");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("aa68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "aa74");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("ab68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "ab74");
-	 * 
-	 * // --------------440
-	 * 
-	 * setCellValue("e9", Double.parseDouble(sentCells.get("t75").toString()));
-	 * notifyUpdateCell("e9");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("u68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "u75");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("v68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "v75");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("w68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "w75");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("x68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "x75");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("y68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "y75");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("z68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "z75");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("aa68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "aa75");
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("ab68").toString()));
-	 * notifyUpdateCell("e7"); getCellResult("t68", "ab75");
-	 * 
-	 * // restableco valores cambiados para calcular la segunda tabla
-	 * 
-	 * setCellValue("e7", Double.parseDouble(sentCells.get("e7").toString()));
-	 * notifyUpdateCell("e7"); setCellValue("e9",
-	 * Double.parseDouble(sentCells.get("e9").toString()));
-	 * notifyUpdateCell("e9");
-	 * 
-	 * // ---------------------------------------------------------------tabla
-	 * // 2
-	 * 
-	 * // ------------------------------------- //System.out.print("averrr : " +
-	 * getCellValue("t81").get("value"));
-	 * 
-	 * setCellValue("m30", Double.parseDouble(getCellValue("t81").value));
-	 * notifyUpdateCell("m30");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("u80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "u81");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("v80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "v81");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("w80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "w81");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("x80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "x81");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("y80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "y81");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("z80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "z81");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("aa80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "aa81");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("ab80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "ab81");
-	 * 
-	 * // --------------------------
-	 * 
-	 * setCellValue("m30", Double.parseDouble(getCellValue("t82").value));
-	 * notifyUpdateCell("m30");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("u80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "u82");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("v80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "v82");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("w80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "w82");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("x80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "x82");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("y80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "y82");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("z80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "z82");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("aa80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "aa82");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("ab80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "ab82");
-	 * 
-	 * // --------------------------
-	 * 
-	 * setCellValue("m30", Double.parseDouble(getCellValue("t83").value));
-	 * notifyUpdateCell("m30");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("u80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "u83");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("v80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "v83");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("w80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "w83");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("x80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "x83");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("y80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "y83");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("z80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "z83");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("aa80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "aa83");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("ab80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "ab83");
-	 * 
-	 * // --------------------------
-	 * 
-	 * setCellValue("m30", Double.parseDouble(getCellValue("t84").value));
-	 * notifyUpdateCell("m30");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("u80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "u84");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("v80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "v84");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("w80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "w84");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("x80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "x84");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("y80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "y84");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("z80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "z84");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("aa80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "aa84");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("ab80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "ab84");
-	 * 
-	 * // --------------------------
-	 * 
-	 * setCellValue("m30", Double.parseDouble(getCellValue("t85").value));
-	 * notifyUpdateCell("m30");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("u80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "u85");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("v80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "v85");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("w80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "w85");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("x80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "x85");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("y80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "y85");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("z80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "z85");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("aa80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "aa85");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("ab80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "ab85");
-	 * 
-	 * // --------------------------
-	 * 
-	 * setCellValue("m30", Double.parseDouble(getCellValue("t86").value));
-	 * notifyUpdateCell("m30");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("u80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "u86");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("v80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "v86");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("w80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "w86");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("x80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "x86");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("y80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "y86");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("z80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "z86");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("aa80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "aa86");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("ab80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "ab86");
-	 * 
-	 * // --------------------------
-	 * 
-	 * setCellValue("m30", Double.parseDouble(getCellValue("t87").value));
-	 * notifyUpdateCell("m30");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("u80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "u87");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("v80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "v87");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("w80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "w87");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("x80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "x87");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("y80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "y87");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("z80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "z87");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("aa80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "aa87");
-	 * 
-	 * setCellValue("e5", Double.parseDouble(sentCells.get("ab80").toString()));
-	 * notifyUpdateCell("e5"); getCellResult("t80", "ab87");
-	 * 
-	 * // ********************************************************
-	 * 
-	 * // -----------------------------------------------------------
-	 * 
-	 * }
-	 * 
-	 */
+	
 
 }

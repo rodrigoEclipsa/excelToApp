@@ -70,7 +70,7 @@ public class CalculateController
     	 post("/calculate/:client_id/:groupapp_id/:filename/:sheetname", (request, response) -> 
     	 {
     		
-    		 
+    		 System.out.println(request.headers("token"));
     		 JSONParser parser = new JSONParser();
     		 
     		 
@@ -86,10 +86,9 @@ public class CalculateController
     		 
     		 
     		 ExcelManager excelManager = new ExcelManager(path, fileName, sheetName, data);
-    		 
-    		 
-    		return "";
-    		//  return  excelManager.calculate().toJSONString();
+    		 excelManager.calculate();
+    
+    		  return  excelManager.resultData.toJSONString();
     		 
     		 
     		    
