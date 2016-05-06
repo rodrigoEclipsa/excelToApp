@@ -67,7 +67,7 @@ public class CalculateController
     	  * http://localhost:4567/calculate/1/1/Margenbrutoganadero18meses.xls/dcria
     	  * 
     	  */
-    	 post("/calculate/:client_id/:groupapp_id/:filename/:sheetname", (request, response) -> 
+    	 post("/calculate/:client_id/:groupapp_id", (request, response) -> 
     	 {
     		
     		 System.out.println(request.headers("token"));
@@ -76,9 +76,13 @@ public class CalculateController
     		 
     		 String clientId = request.params(":client_id");
     		 String groupappId = request.params(":groupapp_Id");
-    		 String fileName = request.params(":filename");
-    		 String sheetName = request.params(":sheetname");
+    		
     		 JSONObject data =  (JSONObject)parser.parse(request.body());
+    		
+    		 
+    		 JSONObject headData = (JSONObject)data.get("head");
+    		 String fileName = (String)headData.get("fileName");
+    		 String sheetName = (String)headData.get("sheetName");
     		 
     		 
     		 //---creo el path

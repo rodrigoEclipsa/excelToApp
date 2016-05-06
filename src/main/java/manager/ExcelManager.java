@@ -77,7 +77,7 @@ public class ExcelManager extends ExcelBase
 
 			calculateAux = Double.parseDouble(valueCell) / 100;
 			this.setCellValue(cellName,
-					calculateAux.toString(),notifyUpdateAll);
+					calculateAux,notifyUpdateAll);
 
 		} 
 		else if(isNumeric(valueCell))
@@ -86,7 +86,7 @@ public class ExcelManager extends ExcelBase
 			calculateAux = Double.parseDouble(valueCell);
 			
 			this.setCellValue(cellName,
-					calculateAux.toString(),notifyUpdateAll);
+					calculateAux,notifyUpdateAll);
 
 		}
 		else
@@ -236,10 +236,37 @@ public class ExcelManager extends ExcelBase
 			calculateResult.add(getResult);
 
 		}
+		
+		
+		
+		
 
 		return calculateResult;
 
 	}
+	
+	
+	
+	private JSONObject getResultAfterNinstances()
+	{
+		
+		JSONArray resultAfterNinstances = (JSONArray) sentData.get("resultAfterNinstances");
+		
+		JSONObject result = new JSONObject();
+		
+		for (Object resultAfterNinstancesItem : resultAfterNinstances)
+		{
+
+			result.put(resultAfterNinstancesItem, 
+					getCellValue((String)resultAfterNinstancesItem).value);
+			
+			
+		}
+		
+		return result;
+		
+	}
+	
 
 	/**
 	 * recibe un array de celdas para calcular y obtener
@@ -268,6 +295,7 @@ public class ExcelManager extends ExcelBase
 			
 		}
 
+		
 		return calculateResult;
 
 	}
@@ -300,6 +328,7 @@ public class ExcelManager extends ExcelBase
 					.get("calculableVar");
 			
 			setCalculableVar(calculableVar,false);
+			
 
 			nextProcess();
 
@@ -324,12 +353,16 @@ public class ExcelManager extends ExcelBase
 				nInstances.put("calculateResult", getResultDinamicComponent());
 
 				resultData.put("nInstances", nInstances);
+				
+				//ver resultAfter
 
 			}
 
-			nextProcess();
+			
 			
 			break;
+			
+		
 			
 		case 3:
 			
@@ -341,7 +374,7 @@ public class ExcelManager extends ExcelBase
 				dataTable.put("calculateResult",getResultDataTable());
 				
 			
-			
+			    resultData.put("dataTable", dataTable);
 			
 			}
 			

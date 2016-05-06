@@ -95,22 +95,50 @@ public class ExcelBase
 			}
 		
 			
-			if(notifyUpdate)
-			{
-				this.notifyUpdateCell(cell);
-				
-			}
+		
 			
+				cell.setCellValue(value);
 			
-			
-			
-			cell.setCellValue(value);
-			
+				if(notifyUpdate)
+				{
+					this.notifyUpdateCell(cell);
+					
+				}
+					
 			
 		}
 		
 
-	
+		public void setCellValue(String cellName, double value,boolean notifyUpdate)
+		{
+			
+			Cell cell = getCellByCoordinate(cellName);
+
+			//si es una formula cambio el tipo de celda para setear un numero
+			//es el caso de las celdas mixtas que pueden ser formula o un valor ingresado por el usuario
+			if (cell.getCellType() == HSSFCell.CELL_TYPE_FORMULA)
+			{
+				
+			//	System.out.println("cell : " + cellName);
+			//	System.out.println("value : " + cellName);
+				
+				cell.setCellType(HSSFCell.CELL_TYPE_STRING);
+			}
+		
+			
+			
+			
+				cell.setCellValue(value);
+			
+
+				if(notifyUpdate)
+				{
+					this.notifyUpdateCell(cell);
+					
+				}
+			
+		}
+		
 	
 	
 	
@@ -356,10 +384,13 @@ public class ExcelBase
 	}
 	
 
-	public boolean isNumeric(String s)
+	public boolean isNumeric(String str)
 	{
-		return s.matches("[-+]?\\d*\\.?\\d+");
+		
+		return str.matches("[-+]?\\d*\\.?\\d+");
 
+		
+		
 	}
 
 }
