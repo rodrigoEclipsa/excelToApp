@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.poi.EncryptedDocumentException;
-import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
@@ -81,23 +80,49 @@ public class ExcelBase
 		public void setCellValue(String cellName, String value,boolean notifyUpdate)
 		{
 			
+			boolean isNumeric = isNumeric(value);
+			
 			Cell cell = getCellByCoordinate(cellName);
 
+			if(cell == null)
+		    cell = createCellBlank(cellName);
+			
+			
 			//si es una formula cambio el tipo de celda para setear un numero
 			//es el caso de las celdas mixtas que pueden ser formula o un valor ingresado por el usuario
-			if (cell.getCellType() == HSSFCell.CELL_TYPE_FORMULA)
+			if (cell.getCellType() == Cell.CELL_TYPE_FORMULA)
 			{
 				
 			//	System.out.println("cell : " + cellName);
 			//	System.out.println("value : " + cellName);
 				
-				cell.setCellType(HSSFCell.CELL_TYPE_STRING);
+				if(isNumeric)
+				{
+					cell.setCellType(Cell.CELL_TYPE_NUMERIC);
+				
+				}
+				else
+				{
+					
+					cell.setCellType(Cell.CELL_TYPE_STRING);	
+				}
+				
 			}
 		
 			
+			if(isNumeric)
+			{
+				
+				cell.setCellValue(Double.parseDouble(value));
+			}
+			else
+			{
+				
+				cell.setCellValue(value);
+			}
 		
 			
-				cell.setCellValue(value);
+				
 			
 				if(notifyUpdate)
 				{
@@ -109,35 +134,6 @@ public class ExcelBase
 		}
 		
 
-		public void setCellValue(String cellName, double value,boolean notifyUpdate)
-		{
-			
-			Cell cell = getCellByCoordinate(cellName);
-
-			//si es una formula cambio el tipo de celda para setear un numero
-			//es el caso de las celdas mixtas que pueden ser formula o un valor ingresado por el usuario
-			if (cell.getCellType() == HSSFCell.CELL_TYPE_FORMULA)
-			{
-				
-			//	System.out.println("cell : " + cellName);
-			//	System.out.println("value : " + cellName);
-				
-				cell.setCellType(HSSFCell.CELL_TYPE_STRING);
-			}
-		
-			
-			
-			
-				cell.setCellValue(value);
-			
-
-				if(notifyUpdate)
-				{
-					this.notifyUpdateCell(cell);
-					
-				}
-			
-		}
 		
 	
 	
@@ -145,11 +141,14 @@ public class ExcelBase
 	public String getFormatString(String cellName)
 	{
 
-		String result;
+		String result = "";
 
 	
+		
 		Cell cell = getCellByCoordinate(cellName);
 
+		//es nulo si la celda nunca se ha usado
+		if(cell != null)
 		result = cell.getCellStyle().getDataFormatString();
 
 		return result;
@@ -180,35 +179,35 @@ public class ExcelBase
 		switch (cellType)
 		{
 
-		case HSSFCell.CELL_TYPE_BLANK:
+		case Cell.CELL_TYPE_BLANK:
 
 			// cellValue.put("type",HSSFCell.CELL_TYPE_BLANK);
 			cellValue.value = cell.getStringCellValue();
 			
 			break;
 
-		case HSSFCell.CELL_TYPE_NUMERIC:
+		case Cell.CELL_TYPE_NUMERIC:
 
 			// cellValue.put("type",HSSFCell.CELL_TYPE_NUMERIC);
 			cellValue.value = Double.toString(cell.getNumericCellValue());
 
 			break;
 
-		case HSSFCell.CELL_TYPE_STRING:
+		case Cell.CELL_TYPE_STRING:
 
 			// cellValue.put("type",HSSFCell.CELL_TYPE_STRING);
 			cellValue.value = cell.getStringCellValue();
 
 			break;
 
-		case HSSFCell.CELL_TYPE_ERROR:
+		case Cell.CELL_TYPE_ERROR:
 
-			cellValue.error = HSSFCell.CELL_TYPE_ERROR;
+			cellValue.error = Cell.CELL_TYPE_ERROR;
 			cellValue.value = Byte.toString(cell.getErrorCellValue());
 
 			break;
 
-		case HSSFCell.CELL_TYPE_FORMULA:
+		case Cell.CELL_TYPE_FORMULA:
 
 			// cellValue.put("type", HSSFCell.CELL_TYPE_ERROR);
 			cellValue.value = cell.getCellFormula();
@@ -227,7 +226,7 @@ public class ExcelBase
 		// si la celda es pocentaje multiplico por 100
 
 		if (cell.getCellStyle().getDataFormatString().contains("%")
-				&& cellType == HSSFCell.CELL_TYPE_NUMERIC)
+				&& cellType == Cell.CELL_TYPE_NUMERIC)
 		{
 
 			Double perceValue = Double.parseDouble(cellValue.value) * 100;
@@ -372,17 +371,47 @@ public class ExcelBase
 	public Cell getCellByCoordinate(String cellName)
 	{
 		
-	
+		Cell cell = null;
+		
 		CellReference cellReference = new CellReference(cellName);
 
+		
+		
 		Row row = sheet.getRow(cellReference.getRow());
 
-		Cell cell = row.getCell(cellReference.getCol());
+		//la fila puede no existir
+		if(row != null)
+		cell = row.getCell(cellReference.getCol());
+		
+		
 		
 		return cell;
 		
 	}
 	
+	
+	
+	public Cell createCellBlank(String cellName)
+	{
+		System.out.println("se crea la celda : " + cellName);
+		
+		CellReference cellReference = new CellReference(cellName);
+
+		Row row = sheet.getRow(cellReference.getRow());
+
+		//la fila puede no existir
+		if(row == null)
+		{
+			row = sheet.createRow(cellReference.getRow());
+			
+		}
+		
+		
+		Cell cell = row.createCell(cellReference.getCol());
+		
+		return cell;
+		
+	}
 
 	public boolean isNumeric(String str)
 	{

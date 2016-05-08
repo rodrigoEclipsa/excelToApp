@@ -33,6 +33,165 @@ public class ExcelManager extends ExcelBase
 	}
 
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	/**
+	 * 
+	 * proceso de calculo 
+	 * 
+	 * 1- se setean las variables 
+	 * 2- se obtienen los resultados 
+	 * 3- se resulve las tablas de datos
+	 * 4- se resuelven los componentes dinamicos 
+	 * 
+	 * 
+	 * 
+	 * @throws Exception
+	 */
+	public void calculate() throws Exception
+	{
+
+		System.out.println("proceso de calculo etapa..." + processStadge);
+
+		switch (processStadge)
+		{
+
+		
+		case 0:
+
+			JSONObject calculableVar = (JSONObject) sentData
+					.get("calculableVar");
+			
+			setCalculableVar(calculableVar,false);
+			
+
+			nextProcess();
+
+			break;
+
+		case 1:
+			
+			JSONArray requestResult = (JSONArray) sentData.get("requestResult");
+			resultData.put("calculateResult", getResult(requestResult));
+
+			nextProcess();
+			break;
+			
+		
+		
+		case 2:
+
+			
+			if (sentData.containsKey("nInstances"))
+			{
+				JSONObject nInstances = new JSONObject();
+
+				nInstances.put("calculateResult", getResultDinamicComponent());
+
+				
+				resultData.put("nInstances", nInstances);
+			
+			}
+			
+			nextProcess();
+			
+			
+			break;
+			
+		case 3:
+			
+			
+			
+			if(sentData.containsKey("resultAfterNinstances"))
+			{
+			
+				resultData.put("resultAfterNinstance",getResultAfterNinstances()) ;
+		
+			}
+		
+			nextProcess();
+			break;
+			
+			
+			
+	
+			
+		
+			
+			
+			
+		case 4:
+			
+			if(sentData.containsKey("dataTable"))
+			{
+				
+				JSONObject dataTable = new JSONObject();
+				
+				dataTable.put("calculateResult",getResultDataTable());
+				
+			
+			    resultData.put("dataTable", dataTable);
+			
+			}
+			
+			
+			nextProcess();
+			
+		 break;
+
+
+	
+			
+		case 5:
+			System.out.println("fin de proceso de calculo");
+			
+		break;
+
+	
+		default:
+			
+			throw new Exception("no existe el proceso");
+
+		}
+
+		
+
+	}
+
+	/**
+	 * 
+	 * este metodo se utiliza para preveer procesos que contengan partes
+	 * asincronicas, y trasnformarlo en algo secuencial sincrono
+	 * 
+	 */
+	private void nextProcess() throws Exception
+	{
+
+		processStadge++;
+
+		calculate();
+	}
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	/**
 	 * 
 	 * setea todas las celdas variables enviadas por el cliente
@@ -77,25 +236,19 @@ public class ExcelManager extends ExcelBase
 
 			calculateAux = Double.parseDouble(valueCell) / 100;
 			this.setCellValue(cellName,
-					calculateAux,notifyUpdateAll);
+					calculateAux.toString(),notifyUpdateAll);
 
 		} 
-		else if(isNumeric(valueCell))
-		{
-
-			calculateAux = Double.parseDouble(valueCell);
-			
-			this.setCellValue(cellName,
-					calculateAux,notifyUpdateAll);
-
-		}
 		else
 		{
-			//es un string, en un futuro se agregara soporte de fechas
+
+			
 			
 			this.setCellValue(cellName,
 					valueCell,notifyUpdateAll);
+
 		}
+		
 
 	}
 
@@ -220,7 +373,8 @@ public class ExcelManager extends ExcelBase
 							
 							String cellNameGen = mapResultColumnKey.toString()+indicateRowMap.toString();
 									
-							setCalculableVar(cellNameGen, getResult.get(getResultKey).toString(),false);
+							setCellValue(cellNameGen, getResult.get(getResultKey).toString(),false);
+							
 							
 							continue;
 							
@@ -236,10 +390,6 @@ public class ExcelManager extends ExcelBase
 			calculateResult.add(getResult);
 
 		}
-		
-		
-		
-		
 
 		return calculateResult;
 
@@ -249,6 +399,8 @@ public class ExcelManager extends ExcelBase
 	
 	private JSONObject getResultAfterNinstances()
 	{
+		
+		
 		
 		JSONArray resultAfterNinstances = (JSONArray) sentData.get("resultAfterNinstances");
 		
@@ -300,122 +452,7 @@ public class ExcelManager extends ExcelBase
 
 	}
 
-	/**
-	 * 
-	 * proceso de calculo 
-	 * 
-	 * 1- se setean las variables 
-	 * 2- se obtienen los resultados 
-	 * 3- se resulve las tablas de datos
-	 * 4- se resuelven los componentes dinamicos 
-	 * 
-	 * 
-	 * 
-	 * @throws Exception
-	 */
-	public void calculate() throws Exception
-	{
-
-		System.out.println("proceso de calculo etapa..." + processStadge);
-
-		switch (processStadge)
-		{
-
-		
-		case 0:
-
-			JSONObject calculableVar = (JSONObject) sentData
-					.get("calculableVar");
-			
-			setCalculableVar(calculableVar,false);
-			
-
-			nextProcess();
-
-			break;
-
-		case 1:
-			
-			JSONArray requestResult = (JSONArray) sentData.get("requestResult");
-			resultData.put("calculateResult", getResult(requestResult));
-
-			nextProcess();
-			break;
-			
-		
-		
-		case 2:
-
-			if (sentData.containsKey("nInstances"))
-			{
-				JSONObject nInstances = new JSONObject();
-
-				nInstances.put("calculateResult", getResultDinamicComponent());
-
-				resultData.put("nInstances", nInstances);
-				
-				//ver resultAfter
-
-			}
-
-			
-			
-			break;
-			
-		
-			
-		case 3:
-			
-			if(sentData.containsKey("dataTable"))
-			{
-				
-				JSONObject dataTable = new JSONObject();
-				
-				dataTable.put("calculateResult",getResultDataTable());
-				
-			
-			    resultData.put("dataTable", dataTable);
-			
-			}
-			
-			
-			nextProcess();
-			
-		 break;
-
-
 	
-			
-		case 4:
-			System.out.println("fin de proceso de calculo");
-			
-		break;
-
-	
-		default:
-			
-			throw new Exception("no existe el proceso");
-
-		}
-
-		
-
-	}
-
-	/**
-	 * 
-	 * este metodo se utiliza para preveer procesos que contengan partes
-	 * asincronicas, y trasnformarlo en algo secuencial sincrono
-	 * 
-	 */
-	private void nextProcess() throws Exception
-	{
-
-		processStadge++;
-
-		calculate();
-	}
-
 	
 
 }
