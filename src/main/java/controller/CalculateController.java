@@ -4,8 +4,8 @@ import static spark.Spark.after;
 import static spark.Spark.before;
 import static spark.Spark.post;
 
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonObject;
 
 import conf.Conf;
 import manager.ExcelManager;
@@ -72,18 +72,19 @@ public class CalculateController
     		
     			
     		 System.out.println(request.headers("token"));
-    		 JSONParser parser = new JSONParser();
+    		
     		 
     		 
     		 String clientId = request.params(":client_id");
     		 String groupappId = request.params(":groupapp_Id");
     		
-    		 JSONObject data =  (JSONObject)parser.parse(request.body());
+    		 JsonObject data =  Json.parse(request.body()).asObject();
     		
     		 
-    		 JSONObject headData = (JSONObject)data.get("head");
-    		 String fileName = (String)headData.get("fileName");
-    		 String sheetName = (String)headData.get("sheetName");
+    		 //datos del head
+    		 JsonObject headData = data.get("head").asObject();
+    		 String fileName = headData.get("fileName").asString();
+    		 String sheetName = headData.get("sheetName").asString();
     		 
     		 
     		 //---creo el path
@@ -96,7 +97,7 @@ public class CalculateController
     		 
     		
     		 
-    		  return  excelManager.resultData.toJSONString();
+    		  return  excelManager.resultData.toString();
     		 
     		 
     		    

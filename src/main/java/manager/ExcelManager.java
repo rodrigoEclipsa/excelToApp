@@ -5,8 +5,11 @@ import java.io.IOException;
 
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+
+import com.eclipsesource.json.JsonArray;
+import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.JsonObject.Member;
+import com.eclipsesource.json.JsonValue;
 
 import classes.CellValue;
 
@@ -14,15 +17,15 @@ import classes.CellValue;
 public class ExcelManager extends ExcelBase
 {
 
-	private JSONObject sentData;
-	public JSONObject resultData = new JSONObject();
+	private JsonObject sentData;
+	public JsonObject resultData = new JsonObject();
 
 
 
 	private int processStadge = 0;
 
 	public ExcelManager(String path, String fileName, String sheetName,
-			JSONObject sentData) throws FileNotFoundException, IOException,
+			JsonObject sentData) throws FileNotFoundException, IOException,
 					EncryptedDocumentException, InvalidFormatException
 	{
 
@@ -65,8 +68,8 @@ public class ExcelManager extends ExcelBase
 		
 		case 0:
 
-			JSONObject calculableVar = (JSONObject) sentData
-					.get("calculableVar");
+			JsonObject calculableVar =  sentData
+					.get("calculableVar").asObject();
 			
 			setCalculableVar(calculableVar,false);
 			
@@ -77,8 +80,8 @@ public class ExcelManager extends ExcelBase
 
 		case 1:
 			
-			JSONArray requestResult = (JSONArray) sentData.get("requestResult");
-			resultData.put("calculateResult", getResult(requestResult));
+			JsonArray requestResult = sentData.get("requestResult").asArray();
+			resultData.add("calculateResult", getResult(requestResult));
 
 			nextProcess();
 			break;
@@ -88,14 +91,15 @@ public class ExcelManager extends ExcelBase
 		case 2:
 
 			
-			if (sentData.containsKey("nInstances"))
+			if (sentData.get("nInstances").isNull())
 			{
-				JSONObject nInstances = new JSONObject();
+				
+				JsonObject nInstances = new JsonObject();
 
-				nInstances.put("calculateResult", getResultDinamicComponent());
+				nInstances.add("calculateResult", getResultDinamicComponent());
 
 				
-				resultData.put("nInstances", nInstances);
+				resultData.add("nInstances", nInstances);
 			
 			}
 			
@@ -108,10 +112,10 @@ public class ExcelManager extends ExcelBase
 			
 			
 			
-			if(sentData.containsKey("resultAfterNinstances"))
+			if(sentData.get("resultAfterNinstances").isNull())
 			{
 			
-				resultData.put("resultAfterNinstance",getResultAfterNinstances()) ;
+				resultData.add("resultAfterNinstance",getResultAfterNinstances()) ;
 		
 			}
 		
@@ -119,24 +123,17 @@ public class ExcelManager extends ExcelBase
 			break;
 			
 			
-			
-	
-			
-		
-			
-			
-			
+				
 		case 4:
 			
-			if(sentData.containsKey("dataTable"))
+			if(sentData.get("dataTable").isNull())
 			{
 				
-				JSONObject dataTable = new JSONObject();
+				JsonObject dataTable = new JsonObject();
 				
-				dataTable.put("calculateResult",getResultDataTable());
+				dataTable.add("calculateResult",getResultDataTable());
 				
-			
-			    resultData.put("dataTable", dataTable);
+			    resultData.add("dataTable", dataTable);
 			
 			}
 			
@@ -197,15 +194,17 @@ public class ExcelManager extends ExcelBase
 	 * setea todas las celdas variables enviadas por el cliente
 	 * 
 	 */
-	private void setCalculableVar(JSONObject calculableVar,boolean notifyUpdateAll) 
+	private void setCalculableVar(JsonObject calculableVar,boolean notifyUpdateAll) 
 	{
 
-		for (Object cellKey : calculableVar.keySet())
+		for (Member cellKey : calculableVar)
 		{
 
-			String valueCell = calculableVar.get(cellKey).toString();
+			
+			
+			String valueCell = calculableVar.get(cellKey.getName()).toString();
 
-			setCalculableVar(cellKey.toString(),valueCell,notifyUpdateAll);
+			setCalculableVar(cellKey.getName(),valueCell,notifyUpdateAll);
 			
 		}
 
@@ -256,18 +255,18 @@ public class ExcelManager extends ExcelBase
 	
 	
 
-	private JSONObject getResultDataTable() 
+	private JsonObject getResultDataTable() 
 	{
 
-		JSONObject calculateResult = new JSONObject();
+		JsonObject calculateResult = new JsonObject();
 		
-		JSONObject dataTable = (JSONObject) sentData.get("dataTable");
+		JsonObject dataTable =  sentData.get("dataTable").asObject();
 		
-		String evaluateFormula = (String)dataTable.get("evaluateFormula");
-		String cellInput0 = (String)dataTable.get("cellInput0");
-		String cellInput1 = (String)dataTable.get("cellInput1");
+		String evaluateFormula = dataTable.get("evaluateFormula").asString();
+		String cellInput0 = dataTable.get("cellInput0").asString();
+		String cellInput1 = dataTable.get("cellInput1").asString();
 		
-		JSONArray calculableVar = (JSONArray)dataTable.get("calculableVar");
+		JsonArray calculableVar = dataTable.get("calculableVar").asArray();
 		
 		//String evaluateFormula = (String)dataTable.get("evaluateFormula");
 		
@@ -275,14 +274,14 @@ public class ExcelManager extends ExcelBase
 		//notifyUpdateCell(cellName);
 		
 		
-		for (Object calculableVarItem : calculableVar)
+		for (JsonValue calculableVarItem : calculableVar)
 		{
 			
-			JSONObject calculableVarItemObj = (JSONObject) calculableVarItem;
+			JsonObject calculableVarItemObj =  calculableVarItem.asObject();
 			
 			
 			
-			if(calculableVarItemObj.containsKey("input0"))
+			if(calculableVarItemObj.get("input0").isNull())
 			{
 			
 				
@@ -292,7 +291,7 @@ public class ExcelManager extends ExcelBase
 			}
 			
 			
-			if(calculableVarItemObj.containsKey("input1"))
+			if(calculableVarItemObj.get("input1").isNull())
 			{
 			
 				setCalculableVar(cellInput1,
@@ -301,7 +300,7 @@ public class ExcelManager extends ExcelBase
 			}
 			
 			
-			calculateResult.put((String)calculableVarItemObj.get("setResult")
+			calculateResult.add(calculableVarItemObj.get("setResult").asString()
 					, getCellValue(evaluateFormula).value);
 			
 			
@@ -323,31 +322,30 @@ public class ExcelManager extends ExcelBase
 	 * @return
 	 * @throws Exception
 	 */
-	private JSONArray getResultDinamicComponent() 
+	private JsonArray getResultDinamicComponent() 
 	{
 
-		JSONArray calculateResult = new JSONArray();
+		JsonArray calculateResult = new JsonArray();
 
-		JSONObject nInstances = (JSONObject) sentData.get("nInstances");
+		JsonObject nInstances = sentData.get("nInstances").asObject();
 
-		JSONArray calculableVar = (JSONArray) nInstances.get("calculableVar");
+		JsonArray calculableVar = nInstances.get("calculableVar").asArray();
 
-		JSONArray requestResult = (JSONArray) nInstances.get("requestResult");
+		JsonArray requestResult =  nInstances.get("requestResult").asArray();
 
-		JSONObject getResult;
+		JsonObject getResult;
 		
 		Integer indicateRowMap = 0;
 		
-		boolean isContentMapResultColumn = nInstances.containsKey("mapResultColumn");
+		boolean isContentMapResultColumn = nInstances.get("mapResultColumn").isNull();
 		
 		
 		// recorro todas las celdas que se requieren obtener
-		for (Object calculableVarItem : calculableVar)
+		for (JsonValue calculableVarItem : calculableVar)
 		{
 
-			setCalculableVar((JSONObject) calculableVarItem,true);
+			setCalculableVar( calculableVarItem.asObject(),true);
 
-			
 			
 			getResult = getResult(requestResult);
 
@@ -357,23 +355,23 @@ public class ExcelManager extends ExcelBase
 			if (isContentMapResultColumn)
 			{
 				
-				JSONObject mapResultColumn = (JSONObject) nInstances.get("mapResultColumn");
+				JsonObject mapResultColumn = (JsonObject) nInstances.get("mapResultColumn");
 			
 				//aumento el numero de fila
 				indicateRowMap++;
 				
 				//asigno resultado a las columnas
-				for (Object mapResultColumnKey : mapResultColumn.keySet())
+				for (Member mapResultColumnKey : mapResultColumn)
 				{
-					for (Object getResultKey : getResult.keySet())
+					for (Member getResultKey : getResult)
 					{
 						//verifico si existen celdas a asignar
-						if(mapResultColumn.get(mapResultColumnKey).equals(getResultKey))
+						if(mapResultColumn.get(mapResultColumnKey.getName()).equals(getResultKey))
 						{
 							
-							String cellNameGen = mapResultColumnKey.toString()+indicateRowMap.toString();
+							String cellNameGen = mapResultColumnKey.getName()+indicateRowMap.toString();
 									
-							setCellValue(cellNameGen, getResult.get(getResultKey).toString(),false);
+							setCellValue(cellNameGen, getResult.get(getResultKey.getName()).toString(),false);
 							
 							
 							continue;
@@ -397,20 +395,21 @@ public class ExcelManager extends ExcelBase
 	
 	
 	
-	private JSONObject getResultAfterNinstances()
+	private JsonObject getResultAfterNinstances()
 	{
 		
 		
 		
-		JSONArray resultAfterNinstances = (JSONArray) sentData.get("resultAfterNinstances");
+		JsonArray resultAfterNinstances = sentData.get("resultAfterNinstances").asArray();
 		
-		JSONObject result = new JSONObject();
+		JsonObject result = new JsonObject();
 		
-		for (Object resultAfterNinstancesItem : resultAfterNinstances)
+		
+		for (JsonValue resultAfterNinstancesItem : resultAfterNinstances)
 		{
 
-			result.put(resultAfterNinstancesItem, 
-					getCellValue((String)resultAfterNinstancesItem).value);
+			result.add(resultAfterNinstancesItem.asString(), 
+					getCellValue(resultAfterNinstancesItem.asString()).value);
 			
 			
 		}
@@ -428,20 +427,20 @@ public class ExcelManager extends ExcelBase
 	 * si es true se notifican cambios en todas las celdas
 	 * @return
 	 */
-	private JSONObject getResult(JSONArray requestResult) 
+	private JsonObject getResult(JsonArray requestResult) 
 	{
 
-		JSONObject calculateResult = new JSONObject();
+		JsonObject calculateResult = new JsonObject();
 
 		// recorro todas las celdas que se requieren obtener
-		for (Object requestResultItem : requestResult)
+		for (JsonValue requestResultItem : requestResult)
 		{
 
 			
 			
-			CellValue cellValue = this.getCellValue((String) requestResultItem);
+			CellValue cellValue = this.getCellValue(requestResultItem.asString());
 
-			calculateResult.put(requestResultItem, cellValue.value);
+			calculateResult.set(requestResultItem.asString(), cellValue.value);
 
 			System.out.println(requestResultItem.toString() + " : " + cellValue.value);
 			

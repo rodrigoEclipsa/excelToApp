@@ -8,12 +8,12 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonObject;
 
 import main.Main;
 import spark.Spark;
@@ -38,11 +38,16 @@ public class CalculateControllerTest
 	
 	
 	@Test
-	public void simpleCalculate() throws ParseException 
+	public void simpleCalculate() 
 	{
 		
 		TestResponse res = request("POST", "/calculate/1/1");
-		JSONObject json = res.json();
+		JsonObject json = res.json();
+		
+		
+		
+		
+		
 		assertEquals(200, res.status);
 		
 	//	assertEquals("john", json.get("name"));
@@ -85,11 +90,11 @@ public class CalculateControllerTest
 			this.body = body;
 		}
 
-		public JSONObject json() throws ParseException {
+		public JsonObject json() {
 			
-			 JSONParser parser = new JSONParser();
+		
 			
-			 JSONObject data =  (JSONObject)parser.parse(body);
+			JsonObject data = Json.parse(body).asObject();
 			 
 			return data;
 		}
