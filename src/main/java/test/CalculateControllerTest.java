@@ -1,10 +1,10 @@
 package test;
 
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -19,100 +19,98 @@ import main.Main;
 import spark.Spark;
 import spark.utils.IOUtils;
 
-public class CalculateControllerTest 
+public class CalculateControllerTest
 {
 
+	
+	
+	private String requestJson = "";
+	
 	@BeforeClass
-	public static void beforeClass() 
+	public static void beforeClass()
 	{
-	Main.main(null);
+		Main.main(null);
 	}
+
 	@AfterClass
-	public static void afterClass() 
+	public static void afterClass()
 	{
-	Spark.stop();
+		Spark.stop();
 	}
-	
-	
-	
-	
-	
+
 	@Test
-	public void simpleCalculate() 
+	public void simpleCalculate()
 	{
-		
-		TestResponse res = request("POST", "/calculate/1/1");
-		JsonObject json = res.json();
-		
-		
-		
-		
-		
+
+		TestResponse res = request("POST", "/calculate/1/1","{'f55':'55'}");
+		// JsonObject json = res.json();
+
+		System.out.println("se recibio : " + res.body);
+
 		assertEquals(200, res.status);
-		
-	//	assertEquals("john", json.get("name"));
-		//assertEquals("john@foobar.com", json.get("email"));
-	//	assertNotNull(json.get("id"));
-	
+
+		// assertEquals("john", json.get("name"));
+		// assertEquals("john@foobar.com", json.get("email"));
+		// assertNotNull(json.get("id"));
+
 	}
-	
-	
-	
-	
-	
-	
-	
-	private TestResponse request(String method, String path) {
-		
-		try {
+
+	private TestResponse request(String method, String path, String body)
+	{
+
+		try
+		{
 			URL url = new URL("http://localhost:4567" + path);
-			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+			HttpURLConnection connection = (HttpURLConnection) url
+					.openConnection();
 			connection.setRequestMethod(method);
+
 			connection.setDoOutput(true);
 			connection.connect();
-			String body = IOUtils.toString(connection.getInputStream());
-			return new TestResponse(connection.getResponseCode(), body);
-		} catch (IOException e) {
+
+			//connection.setRequestProperty("Content-Type","application/json");  
+		
+
+			
+			byte[] outputInBytes = body.getBytes("UTF-8");
+			OutputStream os = connection.getOutputStream();
+			os.write( outputInBytes );    
+			os.close();
+			
+			
+			
+
+			String responseBody = IOUtils.toString(connection.getInputStream());
+			return new TestResponse(connection.getResponseCode(), responseBody);
+
+		} catch (IOException e)
+		{
 			e.printStackTrace();
 			fail("Sending request failed: " + e.getMessage());
 			return null;
 		}
-		
+
 	}
 
-	private static class TestResponse {
+	private static class TestResponse
+	{
 
 		public final String body;
 		public final int status;
 
-		public TestResponse(int status, String body) {
+		public TestResponse(int status, String body)
+		{
 			this.status = status;
 			this.body = body;
 		}
 
-		public JsonObject json() {
-			
-		
-			
+		public JsonObject json()
+		{
+
 			JsonObject data = Json.parse(body).asObject();
-			 
+
 			return data;
 		}
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 
 }
