@@ -3,6 +3,8 @@ package test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -24,7 +26,6 @@ public class CalculateControllerTest
 
 	
 	
-	private String requestJson = "";
 	
 	@BeforeClass
 	public static void beforeClass()
@@ -39,8 +40,24 @@ public class CalculateControllerTest
 	}
 
 	@Test
-	public void simpleCalculate()
+	public void simpleCalculate() throws IOException
 	{
+		
+		try
+		{
+	     String cadena;
+	      FileReader f = new FileReader("json_exceltoapp.json");
+	      BufferedReader b = new BufferedReader(f);
+	      while((cadena = b.readLine())!=null) {
+	          System.out.println(cadena);
+	      }
+	      b.close();
+		}
+		catch(IOException error)
+		{
+			
+			  System.out.println(error.getMessage());
+		}
 
 		TestResponse res = request("POST", "/calculate/1/1","{'f55':'55'}");
 		// JsonObject json = res.json();
