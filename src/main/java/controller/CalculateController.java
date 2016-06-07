@@ -4,6 +4,12 @@ import static spark.Spark.after;
 import static spark.Spark.before;
 import static spark.Spark.post;
 
+import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonObject;
+
+import conf.Conf;
+import manager.ExcelManager;
+
 
 
 public class CalculateController
@@ -64,10 +70,8 @@ public class CalculateController
     	 post("/calculate/:client_id/:groupapp_id", (request, response) -> 
     	 {
     		 
-    		 System.out.println("body"+request.body());
-    			
-    		 return "sss";
-    		 /*
+    		
+    		 
     		 System.out.println(request.headers("token"));
     		
     		 
@@ -95,7 +99,7 @@ public class CalculateController
     		
     		 
     		  return  excelManager.resultData.toString();
-    		 */
+    		 
     		 
     		    
     		});

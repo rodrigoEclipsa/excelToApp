@@ -80,10 +80,15 @@ public class ExcelManager extends ExcelBase
 
 		case 1:
 			
+			if(sentData.get("requestResult") != null)
+			{
 			JsonArray requestResult = sentData.get("requestResult").asArray();
 			resultData.add("calculateResult", getResult(requestResult));
 
 			nextProcess();
+			
+			}
+			
 			break;
 			
 		
@@ -91,7 +96,7 @@ public class ExcelManager extends ExcelBase
 		case 2:
 
 			
-			if (sentData.get("nInstances").isNull())
+			if (sentData.get("nInstances") != null)
 			{
 				
 				JsonObject nInstances = new JsonObject();
@@ -100,8 +105,10 @@ public class ExcelManager extends ExcelBase
 
 				
 				resultData.add("nInstances", nInstances);
+				
 			
 			}
+		
 			
 			nextProcess();
 			
@@ -112,7 +119,7 @@ public class ExcelManager extends ExcelBase
 			
 			
 			
-			if(sentData.get("resultAfterNinstances").isNull())
+			if(sentData.get("resultAfterNinstances") != null)
 			{
 			
 				resultData.add("resultAfterNinstance",getResultAfterNinstances()) ;
@@ -126,7 +133,7 @@ public class ExcelManager extends ExcelBase
 				
 		case 4:
 			
-			if(sentData.get("dataTable").isNull())
+			if(sentData.get("dataTable") != null)
 			{
 				
 				JsonObject dataTable = new JsonObject();
@@ -200,8 +207,7 @@ public class ExcelManager extends ExcelBase
 		for (Member cellKey : calculableVar)
 		{
 
-			
-			
+
 			String valueCell = calculableVar.get(cellKey.getName()).toString();
 
 			setCalculableVar(cellKey.getName(),valueCell,notifyUpdateAll);

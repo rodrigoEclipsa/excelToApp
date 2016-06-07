@@ -64,8 +64,6 @@ public class ExcelBase
 		//WorkbookEvaluator.registerFunction ( "PEARSON", new Pearson() );
 		
 		
-		
-		
 		sheet = wb.getSheet(sheetName);
 		evaluator = wb.getCreationHelper().createFormulaEvaluator();
 		

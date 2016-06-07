@@ -1,4 +1,4 @@
-package test;
+package exceltoapp;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -38,20 +38,35 @@ public class CalculateControllerTest
 	{
 		Spark.stop();
 	}
-
-	@Test
-	public void simpleCalculate() throws IOException
+	
+	
+	
+	private String getJsonFile(String jsonType)
 	{
 		
+		  String fileContent="";
+		  
+		  String path = CalculateControllerTest.class.getResource("/json/"+jsonType).getPath();
+		  
+		  
+		  
 		try
 		{
-	     String cadena;
-	      FileReader f = new FileReader("json_exceltoapp.json");
+			
+	     
+			
+	      FileReader f = new FileReader(path);
 	      BufferedReader b = new BufferedReader(f);
-	      while((cadena = b.readLine())!=null) {
-	          System.out.println(cadena);
+	      String line;
+	      while((line = b.readLine())!=null)
+	      {
+	    	  fileContent += line+"\n";
 	      }
+	       
+	      
 	      b.close();
+	      
+	      
 		}
 		catch(IOException error)
 		{
@@ -59,17 +74,33 @@ public class CalculateControllerTest
 			  System.out.println(error.getMessage());
 		}
 
-		TestResponse res = request("POST", "/calculate/1/1","{'f55':'55'}");
-		// JsonObject json = res.json();
+	
+		return fileContent;
+		
+		
+		
+	}
 
-		System.out.println("se recibio : " + res.body);
+	@Test
+	public void simpleCalculate() throws IOException
+	{
+		
+		String fileContent = getJsonFile("simpleCalculate.json");
+		
+		System.out.println("fileContent : " + fileContent);
+		
+	
 
-		assertEquals(200, res.status);
+		  		TestResponse res = request("POST", "/calculate/1/1",fileContent);
+		  		
+		  		//JsonObject json = res.json();
 
-		// assertEquals("john", json.get("name"));
-		// assertEquals("john@foobar.com", json.get("email"));
-		// assertNotNull(json.get("id"));
+		  		//System.out.println("se recibio : " + res.body);
 
+		  		assertEquals(200, res.status);
+
+		
+	
 	}
 
 	private TestResponse request(String method, String path, String body)
