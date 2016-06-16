@@ -4,12 +4,15 @@
  */
 package manager;
 
-import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.FormulaError;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -17,7 +20,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.ss.util.CellReference;
 
-import classes.CellValue;
+import classes.CellData;
 
 /**
  * 
@@ -27,9 +30,12 @@ import classes.CellValue;
 public class ExcelBase
 {
 
-	//public FileInputStream fis;
+	//protected FileInputStream fis;
 	private Workbook wb;
-	private Sheet sheet;
+	
+	
+	protected Map<String, Sheet> sheets = new HashMap<String, Sheet>();
+	
 	private FormulaEvaluator evaluator;
 
 	/**
@@ -44,7 +50,7 @@ public class ExcelBase
     
 
 
-	public ExcelBase(String path, String fileName, String sheetName) throws IOException, EncryptedDocumentException, InvalidFormatException
+	protected ExcelBase(String path, String fileName, String[] sheetNames) throws IOException, EncryptedDocumentException, InvalidFormatException
 	{
 
 		// System.setProperty ("org.apache.poi.util.POILogger",
@@ -54,33 +60,41 @@ public class ExcelBase
 
 	
        
+		FileInputStream fis = new FileInputStream(path);
 	
-		wb = WorkbookFactory.create(new File(path));
+		wb = WorkbookFactory.create(fis);
 		
-		//fis = new FileInputStream(url);
+	//	wb = WorkbookFactory.create(new File(path));
+		
+		
 		
 		//wb = new HSSFWorkbook(fis); // or new XSSFWorkbook("/somepath/test.xls")
 		
 		//WorkbookEvaluator.registerFunction ( "PEARSON", new Pearson() );
+	
+		//agrego las hojas de calculo
+		for (String sheetNameItem : sheetNames)
+		{
+		
+			sheets.put(sheetNameItem,wb.getSheet(sheetNameItem)); 
+		}
 		
 		
-		sheet = wb.getSheet(sheetName);
+		
 		evaluator = wb.getCreationHelper().createFormulaEvaluator();
-		
-		
 		
 		
 	}
 
 	
-
-		
-		public void setCellValue(String cellName, String value,boolean notifyUpdate)
+	
+	
+		protected void setCellValue(String cellName, String value,boolean notifyUpdate)
 		{
 			
 			boolean isNumeric = isNumeric(value);
 			
-			Cell cell = getCellByCoordinate(cellName);
+			Cell cell = getCellByCellName(cellName);
 
 			if(cell == null)
 		    cell = createCellBlank(cellName);
@@ -136,14 +150,14 @@ public class ExcelBase
 	
 	
 	
-	public String getFormatString(String cellName)
+	protected String getFormatString(String cellName)
 	{
 
 		String result = "";
 
 	
 		
-		Cell cell = getCellByCoordinate(cellName);
+		Cell cell = getCellByCellName(cellName);
 
 		//es nulo si la celda nunca se ha usado
 		if(cell != null)
@@ -156,11 +170,11 @@ public class ExcelBase
 
 
 
-	public CellValue getCellValue(Cell cell) 
+	private CellData getCellValue(Cell cell) 
 	{
 
 		
-		CellValue cellValue = new CellValue();
+		CellData cellData = new CellData();
 	
 		
 	
@@ -179,43 +193,45 @@ public class ExcelBase
 
 		case Cell.CELL_TYPE_BLANK:
 
-			// cellValue.put("type",HSSFCell.CELL_TYPE_BLANK);
-			cellValue.value = cell.getStringCellValue();
+			// cellData.put("type",HSSFCell.CELL_TYPE_BLANK);
+			cellData.value = cell.getStringCellValue();
 			
 			break;
 
 		case Cell.CELL_TYPE_NUMERIC:
 
-			// cellValue.put("type",HSSFCell.CELL_TYPE_NUMERIC);
-			cellValue.value = Double.toString(cell.getNumericCellValue());
+			// cellData.put("type",HSSFCell.CELL_TYPE_NUMERIC);
+			cellData.value = Double.toString(cell.getNumericCellValue());
 
 			break;
 
 		case Cell.CELL_TYPE_STRING:
 
-			// cellValue.put("type",HSSFCell.CELL_TYPE_STRING);
-			cellValue.value = cell.getStringCellValue();
+			// cellData.put("type",HSSFCell.CELL_TYPE_STRING);
+			cellData.value = cell.getStringCellValue();
 
 			break;
 
 		case Cell.CELL_TYPE_ERROR:
 
-			cellValue.error = Cell.CELL_TYPE_ERROR;
-			cellValue.value = Byte.toString(cell.getErrorCellValue());
+			cellData.error = FormulaError.forInt(cell.getErrorCellValue()).name();
+			
+			
+			cellData.value = "ERROR";
 
 			break;
 
 		case Cell.CELL_TYPE_FORMULA:
 
-			// cellValue.put("type", HSSFCell.CELL_TYPE_ERROR);
-			cellValue.value = cell.getCellFormula();
+			// cellData.put("type", HSSFCell.CELL_TYPE_ERROR);
+			cellData.value = cell.getCellFormula();
 
 			break;
 
 		default:
 
-			// cellValue.put("type",HSSFCell.CELL_TYPE_STRING);
-			cellValue.value = cell.getCellStyle().getDataFormatString();
+			// cellData.put("type",HSSFCell.CELL_TYPE_STRING);
+			cellData.value = cell.getCellStyle().getDataFormatString();
 			
 			
 
@@ -227,9 +243,9 @@ public class ExcelBase
 				&& cellType == Cell.CELL_TYPE_NUMERIC)
 		{
 
-			Double perceValue = Double.parseDouble(cellValue.value) * 100;
+			Double perceValue = Double.parseDouble(cellData.value) * 100;
 			
-			cellValue.value = perceValue.toString();
+			cellData.value = perceValue.toString();
 
 		}
 
@@ -238,20 +254,20 @@ public class ExcelBase
 		else
 		{
 			
-			cellValue.value = null;
+			cellData.value = null;
 			
 		}
 	
 		
-		return cellValue;
+		return cellData;
 	}
 
 
-	public CellValue getCellValue(String cellName) 
+	protected CellData getCellValue(String cellName) 
 	{
 
 	
-		Cell cell = getCellByCoordinate(cellName);
+		Cell cell = getCellByCellName(cellName);
 
 		return getCellValue(cell);
 		
@@ -260,10 +276,10 @@ public class ExcelBase
 	
 	
 	/*
-	public JSONObject getCellValueJson(String cellCoordinate) 
+	protected JSONObject getCellValueJson(String cellCoordinate) 
 	{
 
-		CellValue cellValue = getCellValue(cellCoordinate);
+		CellValue cellData = getCellValue(cellCoordinate);
 		
 		
 		JSONObject json = new JSONObject();
@@ -284,7 +300,7 @@ public class ExcelBase
 	 * imprime valores de celdas por pantalla
 	 * 
 	 */
-	public void printCell(String cellName)
+	protected void printCell(String cellName)
 	{
 		
 		System.out.println(cellName+" "+ getCellValue(cellName).value);
@@ -292,18 +308,18 @@ public class ExcelBase
 	}
 	
 	/*
-	public JSONObject getCellJSONValue(String cellCordinate) 
+	protected JSONObject getCellJSONValue(String cellCordinate) 
 	{
 
 		JSONObject cellJson = new JSONObject();
 
-		CellValue cellValue = getCellValue(cellCordinate);
+		CellValue cellData = getCellValue(cellCordinate);
 		
 		
-		cellJson.put("value", cellValue.value);
+		cellJson.put("value", cellData.value);
 		
 
-		if(cellValue.error != 0)
+		if(cellData.error != 0)
 			cellJson.put("error", HSSFCell.CELL_TYPE_ERROR);
 		
 		
@@ -323,12 +339,12 @@ public class ExcelBase
 	 * 
 	 * @param cellName
 	 */
-	public void notifyUpdateCell(String cellName)
+	protected void notifyUpdateCell(String cellName)
 	{
 
 		
 
-		Cell cell = getCellByCoordinate(cellName);
+		Cell cell = getCellByCellName(cellName);
 
 		evaluator.notifyUpdateCell(cell);
 
@@ -337,7 +353,7 @@ public class ExcelBase
 	
 	
 	
-	public void notifyUpdateCell(Cell cell)
+	protected void notifyUpdateCell(Cell cell)
 	{
 
 		
@@ -352,7 +368,7 @@ public class ExcelBase
 	 * elimina todo el cache de calculos, lo calculos
 	 * se tendran que reacer luego de esto.
 	 */
-	public void clearAllCachedResultValues()
+	protected void clearAllCachedResultValues()
 	{
 		
 		evaluator.clearAllCachedResultValues();
@@ -364,23 +380,43 @@ public class ExcelBase
 	//todos las valores enviados por el cliente
 
 	
+	/**
+	 * devuelve el objeto Sheet segun el CellName, este debe tener un formato
+	 * Hoja1!a1 donde Hoja1 es el nombre de la hoja y a1 es el nombre de la celda
+	 * @return
+	 */
+	private CellData getSheetAndRefByCellName(String cellName)
+	{
+		CellData cellData = new CellData();
+		
+			
+		String[] cellNameSplit = cellName.split("!");
+		cellData.sheet = sheets.get(cellNameSplit[0]);
+		cellData.cellRef = cellNameSplit[1];
 	
+		
+		
+	  return cellData;
+	}
 	
-	public Cell getCellByCoordinate(String cellName)
+	protected Cell getCellByCellName(String cellName)
 	{
 		
 		Cell cell = null;
 		
-		CellReference cellReference = new CellReference(cellName);
+		CellData cellData = getSheetAndRefByCellName(cellName);
+		
+		CellReference cellReference = new CellReference(cellData.cellRef);
 
-		
-		
-		Row row = sheet.getRow(cellReference.getRow());
+		Row row = cellData.sheet.getRow(cellReference.getRow());
 
 		//la fila puede no existir
 		if(row != null)
+		{
+			
 		cell = row.getCell(cellReference.getCol());
 		
+		}
 		
 		
 		return cell;
@@ -389,18 +425,20 @@ public class ExcelBase
 	
 	
 	
-	public Cell createCellBlank(String cellName)
+	protected Cell createCellBlank(String cellName)
 	{
 		System.out.println("se crea la celda : " + cellName);
-		
-		CellReference cellReference = new CellReference(cellName);
 
-		Row row = sheet.getRow(cellReference.getRow());
+		CellData cellData = getSheetAndRefByCellName(cellName);
+		
+		CellReference cellReference = new CellReference(cellData.cellRef);
+
+		Row row = cellData.sheet.getRow(cellReference.getRow());
 
 		//la fila puede no existir
 		if(row == null)
 		{
-			row = sheet.createRow(cellReference.getRow());
+			row = cellData.sheet.createRow(cellReference.getRow());
 			
 		}
 		
@@ -411,7 +449,7 @@ public class ExcelBase
 		
 	}
 
-	public boolean isNumeric(String str)
+	protected boolean isNumeric(String str)
 	{
 		
 		return str.matches("[-+]?\\d*\\.?\\d+");

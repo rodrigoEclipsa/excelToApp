@@ -84,15 +84,22 @@ public class CalculateController
     		 
     		 //datos del head
     		 JsonObject headData = data.get("head").asObject();
-    		 String fileName = headData.get("fileName").asString();
-    		 String sheetName = headData.get("sheetName").asString();
+    		
+    		
+    		 //por ahora contemplo 1 solo libro
+    		 JsonObject workBook = headData.get("workBooks").asArray().get(0).asObject();
+    		 
+    		
+    		 
+    		 String fileName = workBook.get("fileName").asString();
+    		 String[] sheetNames = workBook.get("sheetNames").asString().split(",");
     		 
     		 
     		 //---creo el path
     		 String path = Conf.spreadsheetPath+"/"+clientId+"/"+groupappId+"/"+fileName;
     		 
     		 
-    		 ExcelManager excelManager = new ExcelManager(path, fileName, sheetName, data);
+    		 ExcelManager excelManager = new ExcelManager(path, fileName, sheetNames, data);
     		 excelManager.calculate();
     
     		 

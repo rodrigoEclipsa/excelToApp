@@ -47,9 +47,7 @@ public class CalculateControllerTest
 		  String fileContent="";
 		  
 		  String path = CalculateControllerTest.class.getResource("/json/"+jsonType).getPath();
-		  
-		  
-		  
+		  	  
 		try
 		{
 			
@@ -95,7 +93,7 @@ public class CalculateControllerTest
 		  		
 		  		//JsonObject json = res.json();
 
-		  		//System.out.println("se recibio : " + res.body);
+		  		System.out.println("se recibio : \n" + res.body);
 
 		  		assertEquals(200, res.status);
 
@@ -126,8 +124,6 @@ public class CalculateControllerTest
 			os.close();
 			
 			
-			
-
 			String responseBody = IOUtils.toString(connection.getInputStream());
 			return new TestResponse(connection.getResponseCode(), responseBody);
 

@@ -4,16 +4,23 @@
 "head":
 {
 
-"fileName":"Margenbrutoganadero18meses.xls",
-"sheetName":"dcria"
+"workBooks":
+[
 
+{
+"fileName":"simpleCalculate.xlsx",
+"sheetNames":"Hoja1,Hoja2"
+}
+
+]
 },
 
 
 "calculableVar":
 {
 
-"f33":"400"
+"Hoja1!a1":7,
+"Hoja2!a1":222
 
 
 },
@@ -23,8 +30,10 @@
 "requestResult":
 [
 
-"g35"
-
+"Hoja1!a3",
+"Hoja2!a1",
+"Hoja2!b5",
+"Hoja2!a2"
 
 ]
 

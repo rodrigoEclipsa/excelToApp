@@ -11,7 +11,7 @@ import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonObject.Member;
 import com.eclipsesource.json.JsonValue;
 
-import classes.CellValue;
+import classes.CellData;
 
 @SuppressWarnings("unchecked")
 public class ExcelManager extends ExcelBase
@@ -24,24 +24,17 @@ public class ExcelManager extends ExcelBase
 
 	private int processStadge = 0;
 
-	public ExcelManager(String path, String fileName, String sheetName,
+	public ExcelManager(String path, String fileName, String[] sheetNames,
 			JsonObject sentData) throws FileNotFoundException, IOException,
 					EncryptedDocumentException, InvalidFormatException
 	{
 
-		super(path, fileName, sheetName);
+		super(path, fileName, sheetNames);
 
 		this.sentData = sentData;
 
 	}
 
-	
-	
-	
-	
-	
-	
-	
 	
 	
 	/**
@@ -185,17 +178,6 @@ public class ExcelManager extends ExcelBase
 	
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	/**
 	 * 
 	 * setea todas las celdas variables enviadas por el cliente
@@ -207,9 +189,7 @@ public class ExcelManager extends ExcelBase
 		for (Member cellKey : calculableVar)
 		{
 
-
 			String valueCell = calculableVar.get(cellKey.getName()).toString();
-
 			setCalculableVar(cellKey.getName(),valueCell,notifyUpdateAll);
 			
 		}
@@ -444,7 +424,7 @@ public class ExcelManager extends ExcelBase
 
 			
 			
-			CellValue cellValue = this.getCellValue(requestResultItem.asString());
+			CellData cellValue = this.getCellValue(requestResultItem.asString());
 
 			calculateResult.set(requestResultItem.asString(), cellValue.value);
 
