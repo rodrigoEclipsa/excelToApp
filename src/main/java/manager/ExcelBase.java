@@ -6,6 +6,7 @@ package manager;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,11 +17,12 @@ import org.apache.poi.ss.usermodel.FormulaError;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.ss.util.CellReference;
 
 import classes.CellData;
+import classes.WorkBookInfo;
+import classes.WorkBookObject;
 
 /**
  * 
@@ -31,13 +33,12 @@ public class ExcelBase
 {
 
 	//protected FileInputStream fis;
-	private Workbook wb;
-	
+
+	//contiene la informacion de objetos de todos los libros
+	private ArrayList<WorkBookObject> arrWorkBookObject;
 	
 	protected Map<String, Sheet> sheets = new HashMap<String, Sheet>();
-	
 	private FormulaEvaluator evaluator;
-
 	/**
 	 * 
 	 * son las celdas que ya se han modificado
@@ -47,10 +48,7 @@ public class ExcelBase
 //	private Map<String,Boolean> changedCells;
 
 
-    
-
-
-	protected ExcelBase(String path, String fileName, String[] sheetNames) throws IOException, EncryptedDocumentException, InvalidFormatException
+	protected ExcelBase(ArrayList<WorkBookInfo> arrWorkBookInfo) throws IOException, EncryptedDocumentException, InvalidFormatException
 	{
 
 		// System.setProperty ("org.apache.poi.util.POILogger",
@@ -58,34 +56,63 @@ public class ExcelBase
 		// System.setProperty ("poi.log.level", POILogger.INFO + "");
 		// evaluator.setDebugEvaluationOutputForNextEval(true);
 
-	
-       
-		FileInputStream fis = new FileInputStream(path);
-	
-		wb = WorkbookFactory.create(fis);
+		FileInputStream fis;
+		WorkBookObject workBookObject;
+		Map<String,FormulaEvaluator> workbooksEvaluator = new HashMap<String, FormulaEvaluator>();
 		
-	//	wb = WorkbookFactory.create(new File(path));
-		
-		
-		
-		//wb = new HSSFWorkbook(fis); // or new XSSFWorkbook("/somepath/test.xls")
-		
-		//WorkbookEvaluator.registerFunction ( "PEARSON", new Pearson() );
-	
-		//agrego las hojas de calculo
-		for (String sheetNameItem : sheetNames)
+		for (WorkBookInfo workBookInfoItem : arrWorkBookInfo)
 		{
+				 
+			 workBookObject = new WorkBookObject();
 		
-			sheets.put(sheetNameItem,wb.getSheet(sheetNameItem)); 
+			 workBookObject.workBookInfo = workBookInfoItem;
+		
+			 fis = new FileInputStream(workBookInfoItem.path);
+			 workBookObject.workBook = WorkbookFactory.create(fis);
+			
+			 //recorro las hojas del libro
+			for (String sheetNameItem : workBookInfoItem.sheetsName)
+			{
+				workBookObject.sheets.put(sheetNameItem,workBookObject.workBook.getSheet(sheetNameItem)); 
+			}
+			
+			workBookObject.evaluator = workBookObject.workBook.getCreationHelper().createFormulaEvaluator();
+			
+			//mapa de referencias de evaluator
+			workbooksEvaluator.put(workBookInfoItem.fileName, workBookObject.evaluator);
+			
+			arrWorkBookObject.add(workBookObject);
+			
 		}
-		
-		
-		
-		evaluator = wb.getCreationHelper().createFormulaEvaluator();
-		
+       
+		//asigno referencias todos a todos
+		for (WorkBookObject workBookObjectItem : arrWorkBookObject)
+		{
+			workBookObjectItem.evaluator.setupReferencedWorkbooks(workbooksEvaluator);
+		}
+	        
+	
+	
 		
 	}
-
+	
+	private WorkBookObject getWorkBookObjectByName(String name)
+	{
+		WorkBookObject result = null;
+		for (WorkBookObject workBookObjectItem : arrWorkBookObject)
+		{
+			if(workBookObjectItem.workBookInfo.fileName == name)
+			{
+				result = workBookObjectItem;
+				break;
+			}
+		}
+		
+		return result;
+	}
+	
+	
+	
 	
 	
 	
@@ -382,21 +409,26 @@ public class ExcelBase
 	
 	/**
 	 * devuelve el objeto Sheet segun el CellName, este debe tener un formato
-	 * Hoja1!a1 donde Hoja1 es el nombre de la hoja y a1 es el nombre de la celda
+	 * Libro!Sheet!CellRef donde Hoja1 es el nombre de la hoja y a1 es el nombre de la celda
 	 * @return
 	 */
 	private CellData getSheetAndRefByCellName(String cellName)
 	{
-		CellData cellData = new CellData();
 		
-			
+		CellData cellData = new CellData();
+	
 		String[] cellNameSplit = cellName.split("!");
-		cellData.sheet = sheets.get(cellNameSplit[0]);
+		
+		WorkBookObject workBookObject = getWorkBookObjectByName(cellNameSplit[0]);
+		
+		cellData.sheet =  sheets.get(cellNameSplit[0]);
 		cellData.cellRef = cellNameSplit[1];
 	
 		
 		
+		
 	  return cellData;
+	
 	}
 	
 	protected Cell getCellByCellName(String cellName)

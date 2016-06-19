@@ -4,11 +4,17 @@ import static spark.Spark.after;
 import static spark.Spark.before;
 import static spark.Spark.post;
 
-import com.eclipsesource.json.Json;
-import com.eclipsesource.json.JsonObject;
+import java.util.ArrayList;
 
+import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonArray;
+import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.JsonValue;
+
+import classes.WorkBookInfo;
 import conf.Conf;
 import manager.ExcelManager;
+import util.GeneralUtil;
 
 
 
@@ -74,37 +80,37 @@ public class CalculateController
     		 
     		 System.out.println(request.headers("token"));
     		
-    		 
-    		 
     		 String clientId = request.params(":client_id");
     		 String groupappId = request.params(":groupapp_Id");
     		
     		 JsonObject data =  Json.parse(request.body()).asObject();
     		
-    		 
     		 //datos del head
     		 JsonObject headData = data.get("head").asObject();
-    		
-    		
-    		 //por ahora contemplo 1 solo libro
-    		 JsonObject workBook = headData.get("workBooks").asArray().get(0).asObject();
+    	
+    		 JsonArray workBooks = headData.get("workBooks").asArray();
     		 
-    		
+    		 ArrayList<WorkBookInfo> arrWorkBookInfo = new ArrayList<WorkBookInfo>();
     		 
-    		 String fileName = workBook.get("fileName").asString();
-    		 String[] sheetNames = workBook.get("sheetNames").asString().split(",");
+    		 WorkBookInfo workBookInfo;
+    		 for (JsonValue workBookItem : workBooks)
+			 {
+				workBookInfo = new WorkBookInfo();
+				workBookInfo.fileName = workBookItem.asObject().get("fileName").asString();
+				workBookInfo.path = Conf.spreadsheetPath+"/"+clientId+"/"+groupappId+"/"+workBookItem.asObject().get("fileName").asString();
+				
+				workBookInfo.sheetsName = GeneralUtil.getArrayString(workBookItem.asObject().get("sheetNames").asArray());
+				
+			    arrWorkBookInfo.add(workBookInfo);
+    			 
+			 }
     		 
     		 
-    		 //---creo el path
-    		 String path = Conf.spreadsheetPath+"/"+clientId+"/"+groupappId+"/"+fileName;
-    		 
-    		 
-    		 ExcelManager excelManager = new ExcelManager(path, fileName, sheetNames, data);
+    		 ExcelManager excelManager = new ExcelManager(arrWorkBookInfo, data);
     		 excelManager.calculate();
     
     		 
-    		
-    		 
+
     		  return  excelManager.resultData.toString();
     		 
     		 

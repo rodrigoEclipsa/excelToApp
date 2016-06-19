@@ -2,6 +2,7 @@ package manager;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -12,6 +13,7 @@ import com.eclipsesource.json.JsonObject.Member;
 import com.eclipsesource.json.JsonValue;
 
 import classes.CellData;
+import classes.WorkBookInfo;
 
 @SuppressWarnings("unchecked")
 public class ExcelManager extends ExcelBase
@@ -21,15 +23,14 @@ public class ExcelManager extends ExcelBase
 	public JsonObject resultData = new JsonObject();
 
 
-
 	private int processStadge = 0;
 
-	public ExcelManager(String path, String fileName, String[] sheetNames,
+	public ExcelManager(ArrayList<WorkBookInfo> arrWorkBookInfo,
 			JsonObject sentData) throws FileNotFoundException, IOException,
 					EncryptedDocumentException, InvalidFormatException
 	{
 
-		super(path, fileName, sheetNames);
+		super(arrWorkBookInfo);
 
 		this.sentData = sentData;
 
