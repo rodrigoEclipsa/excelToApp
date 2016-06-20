@@ -99,7 +99,7 @@ public class CalculateController
 				workBookInfo.fileName = workBookItem.asObject().get("fileName").asString();
 				workBookInfo.path = Conf.spreadsheetPath+"/"+clientId+"/"+groupappId+"/"+workBookItem.asObject().get("fileName").asString();
 				
-				workBookInfo.sheetsName = GeneralUtil.getArrayString(workBookItem.asObject().get("sheetNames").asArray());
+				workBookInfo.sheetsNames = GeneralUtil.getArrayString(workBookItem.asObject().get("sheetsNames").asArray());
 				
 			    arrWorkBookInfo.add(workBookInfo);
     			 

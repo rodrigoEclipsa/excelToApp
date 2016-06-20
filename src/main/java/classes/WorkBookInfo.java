@@ -13,6 +13,6 @@ public class WorkBookInfo
 
 	public String path;
 	public String fileName;
-	public ArrayList<String> sheetsName;
+	public ArrayList<String> sheetsNames;
 
 }

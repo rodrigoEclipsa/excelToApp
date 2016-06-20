@@ -16,7 +16,6 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.FormulaError;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.ss.util.CellReference;
 
@@ -35,17 +34,17 @@ public class ExcelBase
 	//protected FileInputStream fis;
 
 	//contiene la informacion de objetos de todos los libros
-	private ArrayList<WorkBookObject> arrWorkBookObject;
+	private ArrayList<WorkBookObject> arrWorkBookObject =new ArrayList<WorkBookObject>();
 	
-	protected Map<String, Sheet> sheets = new HashMap<String, Sheet>();
-	private FormulaEvaluator evaluator;
+	//protected Map<String, Sheet> sheets = new HashMap<String, Sheet>();
+//	private FormulaEvaluator evaluator;
 	/**
 	 * 
 	 * son las celdas que ya se han modificado
 	 * se necesitan almacenar para poder notificar los
 	 * cambios en modificaciones posteriores
 	 */
-//	private Map<String,Boolean> changedCells;
+
 
 
 	protected ExcelBase(ArrayList<WorkBookInfo> arrWorkBookInfo) throws IOException, EncryptedDocumentException, InvalidFormatException
@@ -71,7 +70,7 @@ public class ExcelBase
 			 workBookObject.workBook = WorkbookFactory.create(fis);
 			
 			 //recorro las hojas del libro
-			for (String sheetNameItem : workBookInfoItem.sheetsName)
+			for (String sheetNameItem : workBookInfoItem.sheetsNames)
 			{
 				workBookObject.sheets.put(sheetNameItem,workBookObject.workBook.getSheet(sheetNameItem)); 
 			}
@@ -96,40 +95,22 @@ public class ExcelBase
 		
 	}
 	
-	private WorkBookObject getWorkBookObjectByName(String name)
-	{
-		WorkBookObject result = null;
-		for (WorkBookObject workBookObjectItem : arrWorkBookObject)
-		{
-			if(workBookObjectItem.workBookInfo.fileName == name)
-			{
-				result = workBookObjectItem;
-				break;
-			}
-		}
-		
-		return result;
-	}
 	
-	
-	
-	
-	
-	
+
 		protected void setCellValue(String cellName, String value,boolean notifyUpdate)
 		{
 			
 			boolean isNumeric = isNumeric(value);
 			
-			Cell cell = getCellByCellName(cellName);
+			CellData cellData = getCellDataByCellName(cellName);
 
-			if(cell == null)
-		    cell = createCellBlank(cellName);
+			if(cellData.cell == null)
+				cellData.cell = createCellBlank(cellName);
 			
 			
 			//si es una formula cambio el tipo de celda para setear un numero
 			//es el caso de las celdas mixtas que pueden ser formula o un valor ingresado por el usuario
-			if (cell.getCellType() == Cell.CELL_TYPE_FORMULA)
+			if (cellData.cell.getCellType() == Cell.CELL_TYPE_FORMULA)
 			{
 				
 			//	System.out.println("cell : " + cellName);
@@ -137,13 +118,13 @@ public class ExcelBase
 				
 				if(isNumeric)
 				{
-					cell.setCellType(Cell.CELL_TYPE_NUMERIC);
+					cellData.cell.setCellType(Cell.CELL_TYPE_NUMERIC);
 				
 				}
 				else
 				{
 					
-					cell.setCellType(Cell.CELL_TYPE_STRING);	
+					cellData.cell.setCellType(Cell.CELL_TYPE_STRING);	
 				}
 				
 			}
@@ -152,12 +133,12 @@ public class ExcelBase
 			if(isNumeric)
 			{
 				
-				cell.setCellValue(Double.parseDouble(value));
+				cellData.cell.setCellValue(Double.parseDouble(value));
 			}
 			else
 			{
 				
-				cell.setCellValue(value);
+				cellData.cell.setCellValue(value);
 			}
 		
 			
@@ -165,7 +146,7 @@ public class ExcelBase
 			
 				if(notifyUpdate)
 				{
-					this.notifyUpdateCell(cell);
+					this.notifyUpdateCell(cellData);
 					
 				}
 					
@@ -184,11 +165,11 @@ public class ExcelBase
 
 	
 		
-		Cell cell = getCellByCellName(cellName);
+		CellData cellData = getCellDataByCellName(cellName);
 
 		//es nulo si la celda nunca se ha usado
-		if(cell != null)
-		result = cell.getCellStyle().getDataFormatString();
+		if(cellData.cell != null)
+		result = cellData.cell.getCellStyle().getDataFormatString();
 
 		return result;
 
@@ -197,22 +178,20 @@ public class ExcelBase
 
 
 
-	private CellData getCellValue(Cell cell) 
+	private CellData getCellValue(CellData cellData) 
 	{
 
 		
-		CellData cellData = new CellData();
+		//CellData cellData = new CellData();
 	
-		
-	
-	
-		if(cell != null)
+
+		if(cellData.cell != null)
 		{
 		// evaluator.evaluateFormulaCell(cell);
 
-		int cellTypeEvaluator = evaluator.evaluateFormulaCell(cell);
+		int cellTypeEvaluator = cellData.workBookObject.evaluator.evaluateFormulaCell(cellData.cell);
 
-		int cellType = cellTypeEvaluator > -1 ? cellTypeEvaluator : cell
+		int cellType = cellTypeEvaluator > -1 ? cellTypeEvaluator : cellData.cell
 				.getCellType();
 
 		switch (cellType)
@@ -221,27 +200,27 @@ public class ExcelBase
 		case Cell.CELL_TYPE_BLANK:
 
 			// cellData.put("type",HSSFCell.CELL_TYPE_BLANK);
-			cellData.value = cell.getStringCellValue();
+			cellData.value = cellData.cell.getStringCellValue();
 			
 			break;
 
 		case Cell.CELL_TYPE_NUMERIC:
 
 			// cellData.put("type",HSSFCell.CELL_TYPE_NUMERIC);
-			cellData.value = Double.toString(cell.getNumericCellValue());
+			cellData.value = Double.toString(cellData.cell.getNumericCellValue());
 
 			break;
 
 		case Cell.CELL_TYPE_STRING:
 
 			// cellData.put("type",HSSFCell.CELL_TYPE_STRING);
-			cellData.value = cell.getStringCellValue();
+			cellData.value = cellData.cell.getStringCellValue();
 
 			break;
 
 		case Cell.CELL_TYPE_ERROR:
 
-			cellData.error = FormulaError.forInt(cell.getErrorCellValue()).name();
+			cellData.error = FormulaError.forInt(cellData.cell.getErrorCellValue()).name();
 			
 			
 			cellData.value = "ERROR";
@@ -251,14 +230,14 @@ public class ExcelBase
 		case Cell.CELL_TYPE_FORMULA:
 
 			// cellData.put("type", HSSFCell.CELL_TYPE_ERROR);
-			cellData.value = cell.getCellFormula();
+			cellData.value = cellData.cell.getCellFormula();
 
 			break;
 
 		default:
 
 			// cellData.put("type",HSSFCell.CELL_TYPE_STRING);
-			cellData.value = cell.getCellStyle().getDataFormatString();
+			cellData.value = cellData.cell.getCellStyle().getDataFormatString();
 			
 			
 
@@ -266,7 +245,7 @@ public class ExcelBase
 
 		// si la celda es pocentaje multiplico por 100
 
-		if (cell.getCellStyle().getDataFormatString().contains("%")
+		if (cellData.cell.getCellStyle().getDataFormatString().contains("%")
 				&& cellType == Cell.CELL_TYPE_NUMERIC)
 		{
 
@@ -294,9 +273,9 @@ public class ExcelBase
 	{
 
 	
-		Cell cell = getCellByCellName(cellName);
+		CellData cellData = getCellDataByCellName(cellName);
 
-		return getCellValue(cell);
+		return getCellValue(cellData);
 		
 	
 	}
@@ -371,20 +350,20 @@ public class ExcelBase
 
 		
 
-		Cell cell = getCellByCellName(cellName);
+		CellData cellData = getCellDataByCellName(cellName);
 
-		evaluator.notifyUpdateCell(cell);
+		cellData.workBookObject.evaluator.notifyUpdateCell(cellData.cell);
 
 		
 	}
 	
 	
 	
-	protected void notifyUpdateCell(Cell cell)
+	protected void notifyUpdateCell(CellData cellData)
 	{
 
 		
-		evaluator.notifyUpdateCell(cell);
+		cellData.workBookObject.evaluator.notifyUpdateCell(cellData.cell);
 
 		
 	}
@@ -395,24 +374,46 @@ public class ExcelBase
 	 * elimina todo el cache de calculos, lo calculos
 	 * se tendran que reacer luego de esto.
 	 */
+	/*
 	protected void clearAllCachedResultValues()
 	{
 		
 		evaluator.clearAllCachedResultValues();
 		
 	}
-
+*/
 	// --------------------------------------------------------------------------------------------
 	// funciones para la obtencion de datos, aqui se obtienen los datos de las planillas luego de ser seteados
 	//todos las valores enviados por el cliente
 
+	/**
+	 * devuelve el workBookObject segun el nombre del libro
+	 * si no lo encuentra devuelve null
+	 * @param name
+	 * @return
+	 */
+	private WorkBookObject getWorkBookObjectByName(String name)
+	{
+		WorkBookObject result = null;
+		for (WorkBookObject workBookObjectItem : arrWorkBookObject)
+		{
+			if(workBookObjectItem.workBookInfo.fileName.equals(name))
+			{
+				result = workBookObjectItem;
+				break;
+			}
+		}
+		
+		return result;
+	}
+	
 	
 	/**
-	 * devuelve el objeto Sheet segun el CellName, este debe tener un formato
+	 * devuelve cellData segun el CellName, este debe tener un formato
 	 * Libro!Sheet!CellRef donde Hoja1 es el nombre de la hoja y a1 es el nombre de la celda
 	 * @return
 	 */
-	private CellData getSheetAndRefByCellName(String cellName)
+	private CellData getCellDataByCellName(String cellName)
 	{
 		
 		CellData cellData = new CellData();
@@ -420,23 +421,34 @@ public class ExcelBase
 		String[] cellNameSplit = cellName.split("!");
 		
 		WorkBookObject workBookObject = getWorkBookObjectByName(cellNameSplit[0]);
+		cellData.workBookObject = workBookObject;
+		cellData.sheet =  workBookObject.sheets.get(cellNameSplit[1]);
+		cellData.cellRef = cellNameSplit[2];
 		
-		cellData.sheet =  sheets.get(cellNameSplit[0]);
-		cellData.cellRef = cellNameSplit[1];
-	
+		//obtengo objeto cell
+		CellReference cellReference = new CellReference(cellData.cellRef);
+		Row row = cellData.sheet.getRow(cellReference.getRow());
+
+		//la fila puede no existir
+		if(row != null)
+		{
+			
+			cellData.cell = row.getCell(cellReference.getCol());
 		
+		}
 		
 		
 	  return cellData;
 	
 	}
 	
+	/*
 	protected Cell getCellByCellName(String cellName)
 	{
 		
 		Cell cell = null;
 		
-		CellData cellData = getSheetAndRefByCellName(cellName);
+		CellData cellData = getCellDataByCellName(cellName);
 		
 		CellReference cellReference = new CellReference(cellData.cellRef);
 
@@ -454,14 +466,14 @@ public class ExcelBase
 		return cell;
 		
 	}
-	
+	*/
 	
 	
 	protected Cell createCellBlank(String cellName)
 	{
 		System.out.println("se crea la celda : " + cellName);
 
-		CellData cellData = getSheetAndRefByCellName(cellName);
+		CellData cellData = getCellDataByCellName(cellName);
 		
 		CellReference cellReference = new CellReference(cellData.cellRef);
 

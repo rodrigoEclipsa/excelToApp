@@ -1,5 +1,6 @@
 package classes;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
@@ -20,7 +21,7 @@ public class WorkBookObject
 	public WorkBookInfo workBookInfo;
 	
 	public Workbook workBook;
-	public Map<String, Sheet> sheets;
+	public Map<String, Sheet> sheets = new HashMap<String, Sheet>();
 	public FormulaEvaluator evaluator;
 	
 	

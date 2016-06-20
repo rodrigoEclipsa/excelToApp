@@ -9,13 +9,13 @@
 
 {
 "fileName":"simpleCalculate0.xlsx",
-"sheetNames":["Hoja1","Hoja2"]
+"sheetsNames":["Hoja1","Hoja2"]
 
 },
 
 {
 "fileName":"simpleCalculate1.xlsx",
-"sheetNames":["Hoja1","Hoja2"]
+"sheetsNames":["Hoja1","Hoja2"]
 
 }
 
@@ -26,8 +26,8 @@
 "calculableVar":
 {
 
-"simpleCalculate.xlsx!Hoja1!a1":7,
-"simpleCalculate.xlsx!Hoja2!a1":222
+"simpleCalculate0.xlsx!Hoja1!a1":7,
+"simpleCalculate0.xlsx!Hoja2!a1":222
 
 
 
@@ -38,10 +38,10 @@
 "requestResult":
 [
 
-"simpleCalculate.xlsx!Hoja1!a3",
-"simpleCalculate.xlsx!Hoja2!a1",
-"simpleCalculate.xlsx!Hoja2!b5",
-"simpleCalculate.xlsx!Hoja2!a2"
+"simpleCalculate0.xlsx!Hoja1!a3",
+"simpleCalculate0.xlsx!Hoja2!a1",
+"simpleCalculate0.xlsx!Hoja2!b5",
+"simpleCalculate0.xlsx!Hoja2!a2"
 
 ]
 

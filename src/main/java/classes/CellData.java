@@ -1,7 +1,7 @@
 package classes;
 
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
 
 public class CellData
 {
@@ -9,7 +9,7 @@ public class CellData
 	/*
 	 * libro
 	 */
-	public Workbook workBook;
+	public WorkBookObject workBookObject;
 	
 	/**
 	 * valor de la celda
@@ -30,6 +30,12 @@ public class CellData
 	 * codigo de error
 	 */
 	public String error;
+	
+	
+	/**
+	 * cell ref
+	 */
+	public Cell cell;
 	
 	
 }
