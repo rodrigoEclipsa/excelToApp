@@ -26,7 +26,7 @@ cuando se genera componentes dinamicamente se pierde posibilidad que el desarrol
 
 },
 //caso nInstancias
-//puede haver muchos componentes dinamicos
+//puede ser muchos componentes dinamicos
 "nInstances":
 [
 
@@ -36,7 +36,7 @@ cuando se genera componentes dinamicamente se pierde posibilidad que el desarrol
 //en determinada columna , dicha columna esta destinada a almacenar este valor
 "mapResultColumn":
 {
-//"columna": celda
+"columna": celda
 "ab": "f101",
 "ac": "g102"
 

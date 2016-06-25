@@ -76,8 +76,6 @@ public class CalculateController
     	 post("/calculate/:client_id/:groupapp_id", (request, response) -> 
     	 {
     		 
-    		
-    		 
     		 System.out.println(request.headers("token"));
     		
     		 String clientId = request.params(":client_id");
@@ -91,27 +89,26 @@ public class CalculateController
     		 JsonArray workBooks = headData.get("workBooks").asArray();
     		 
     		 ArrayList<WorkBookInfo> arrWorkBookInfo = new ArrayList<WorkBookInfo>();
-    		 
+   
     		 WorkBookInfo workBookInfo;
     		 for (JsonValue workBookItem : workBooks)
 			 {
 				workBookInfo = new WorkBookInfo();
 				workBookInfo.fileName = workBookItem.asObject().get("fileName").asString();
+				//ruta del excel
 				workBookInfo.path = Conf.spreadsheetPath+"/"+clientId+"/"+groupappId+"/"+workBookItem.asObject().get("fileName").asString();
-				
+	
 				workBookInfo.sheetsNames = GeneralUtil.getArrayString(workBookItem.asObject().get("sheetsNames").asArray());
 				
 			    arrWorkBookInfo.add(workBookInfo);
     			 
 			 }
     		 
-    		 
     		 ExcelManager excelManager = new ExcelManager(arrWorkBookInfo, data);
     		 excelManager.calculate();
     
     		 
-
-    		  return  excelManager.resultData.toString();
+    		 return  excelManager.resultData.toString();
     		 
     		 
     		    

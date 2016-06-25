@@ -474,18 +474,14 @@ public class ExcelBase
 		System.out.println("se crea la celda : " + cellName);
 
 		CellData cellData = getCellDataByCellName(cellName);
-		
 		CellReference cellReference = new CellReference(cellData.cellRef);
-
 		Row row = cellData.sheet.getRow(cellReference.getRow());
 
 		//la fila puede no existir
 		if(row == null)
 		{
-			row = cellData.sheet.createRow(cellReference.getRow());
-			
+			row = cellData.sheet.createRow(cellReference.getRow());	
 		}
-		
 		
 		Cell cell = row.createCell(cellReference.getCol());
 		

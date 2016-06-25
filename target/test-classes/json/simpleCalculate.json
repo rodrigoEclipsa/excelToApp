@@ -26,9 +26,9 @@
 "calculableVar":
 {
 
-"simpleCalculate0.xlsx!Hoja1!a1":7,
-"simpleCalculate0.xlsx!Hoja2!a1":222
-
+"simpleCalculate0.xlsx!Hoja1!a1":1,
+"simpleCalculate0.xlsx!Hoja2!a1":2,
+"simpleCalculate1.xlsx!Hoja1!a1":3
 
 
 },
@@ -39,10 +39,8 @@
 [
 
 "simpleCalculate0.xlsx!Hoja1!a3",
-"simpleCalculate0.xlsx!Hoja2!a1",
-"simpleCalculate0.xlsx!Hoja2!b5",
-"simpleCalculate0.xlsx!Hoja2!a2"
-
+"simpleCalculate0.xlsx!Hoja2!a4",
+"simpleCalculate1.xlsx!Hoja1!a1"
 ]
 
 

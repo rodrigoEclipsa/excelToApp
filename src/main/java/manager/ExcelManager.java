@@ -76,6 +76,7 @@ public class ExcelManager extends ExcelBase
 			
 			if(sentData.get("requestResult") != null)
 			{
+				
 			JsonArray requestResult = sentData.get("requestResult").asArray();
 			resultData.add("calculateResult", getResult(requestResult));
 
@@ -93,12 +94,9 @@ public class ExcelManager extends ExcelBase
 			if (sentData.get("nInstances") != null)
 			{
 				
-				JsonObject nInstances = new JsonObject();
-
-				nInstances.add("calculateResult", getResultDinamicComponent());
-
 				
-				resultData.add("nInstances", nInstances);
+
+				resultData.add("nInstances", getResultDinamicComponent());
 				
 			
 			}
@@ -110,22 +108,6 @@ public class ExcelManager extends ExcelBase
 			break;
 			
 		case 3:
-			
-			
-			
-			if(sentData.get("resultAfterNinstances") != null)
-			{
-			
-				resultData.add("resultAfterNinstance",getResultAfterNinstances()) ;
-		
-			}
-		
-			nextProcess();
-			break;
-			
-			
-				
-		case 4:
 			
 			if(sentData.get("dataTable") != null)
 			{
@@ -143,10 +125,7 @@ public class ExcelManager extends ExcelBase
 			
 		 break;
 
-
-	
-			
-		case 5:
+		case 4:
 			System.out.println("fin de proceso de calculo");
 			
 		break;
@@ -268,7 +247,7 @@ public class ExcelManager extends ExcelBase
 			
 			
 			
-			if(calculableVarItemObj.get("input0").isNull())
+			if(!calculableVarItemObj.get("input0").isNull())
 			{
 			
 				
@@ -278,7 +257,7 @@ public class ExcelManager extends ExcelBase
 			}
 			
 			
-			if(calculableVarItemObj.get("input1").isNull())
+			if(!calculableVarItemObj.get("input1").isNull())
 			{
 			
 				setCalculableVar(cellInput1,
@@ -312,20 +291,30 @@ public class ExcelManager extends ExcelBase
 	private JsonArray getResultDinamicComponent() 
 	{
 
-		JsonArray calculateResult = new JsonArray();
+		JsonArray resultComponents = new JsonArray();
+		JsonObject resultObj;
+     	JsonArray calculateResult;
 
-		JsonObject nInstances = sentData.get("nInstances").asObject();
+		JsonArray nInstances = sentData.get("nInstances").asArray();
 
-		JsonArray calculableVar = nInstances.get("calculableVar").asArray();
-
-		JsonArray requestResult =  nInstances.get("requestResult").asArray();
-
+		JsonArray calculableVar;
+		JsonArray requestResult;
 		JsonObject getResult;
+		Integer indicateRowMap;
+		boolean isContentMapResultColumn;
 		
-		Integer indicateRowMap = 0;
+		for (JsonValue nInstancesItem : nInstances)
+		{
 		
-		boolean isContentMapResultColumn = nInstances.get("mapResultColumn").isNull();
+		 calculateResult = new JsonArray();
 		
+		 calculableVar = nInstancesItem.asObject().get("calculableVar").asArray();
+
+		 requestResult =  nInstancesItem.asObject().get("requestResult").asArray();
+
+		 indicateRowMap = 0;
+		
+		 isContentMapResultColumn = !nInstancesItem.asObject().get("mapResultColumn").isNull();
 		
 		// recorro todas las celdas que se requieren obtener
 		for (JsonValue calculableVarItem : calculableVar)
@@ -336,13 +325,11 @@ public class ExcelManager extends ExcelBase
 			
 			getResult = getResult(requestResult);
 
-			
-			
 			// si contiene un mapa de asignacion a columnas
 			if (isContentMapResultColumn)
 			{
 				
-				JsonObject mapResultColumn = (JsonObject) nInstances.get("mapResultColumn");
+				JsonObject mapResultColumn = nInstancesItem.asObject().get("mapResultColumn").asObject();
 			
 				//aumento el numero de fila
 				indicateRowMap++;
@@ -352,14 +339,13 @@ public class ExcelManager extends ExcelBase
 				{
 					for (Member getResultKey : getResult)
 					{
+						
 						//verifico si existen celdas a asignar
-						if(mapResultColumn.get(mapResultColumnKey.getName()).equals(getResultKey))
+						if(mapResultColumn.get(mapResultColumnKey.getName()).asString().equals(getResultKey.getName()))
 						{
 							
-							String cellNameGen = mapResultColumnKey.getName()+indicateRowMap.toString();
-									
-							setCellValue(cellNameGen, getResult.get(getResultKey.getName()).toString(),false);
-							
+							String cellNameGen = mapResultColumnKey.getName()+indicateRowMap.toString();		
+							setCellValue(cellNameGen, getResult.get(getResultKey.getName()).asString(),false);
 							
 							continue;
 							
@@ -376,34 +362,35 @@ public class ExcelManager extends ExcelBase
 
 		}
 
-		return calculateResult;
-
-	}
-	
-	
-	
-	private JsonObject getResultAfterNinstances()
-	{
+		resultObj = new JsonObject(); 
+		resultObj.add("calculateResult", calculateResult);
 		
-		
-		
-		JsonArray resultAfterNinstances = sentData.get("resultAfterNinstances").asArray();
+		//resulevo los calculos luego de que se hallan mapeado los datos
+        JsonArray resultAfterNinstances = nInstancesItem.asObject().get("resultAfterNinstances").asArray();
 		
 		JsonObject result = new JsonObject();
 		
-		
 		for (JsonValue resultAfterNinstancesItem : resultAfterNinstances)
 		{
-
 			result.add(resultAfterNinstancesItem.asString(), 
 					getCellValue(resultAfterNinstancesItem.asString()).value);
-			
-			
+		
 		}
 		
-		return result;
+		resultObj.add("resultAfterNinstances", result);
+		resultComponents.add(resultObj);
 		
+		}
+		
+		
+		
+		return resultComponents;
+
 	}
+	
+	
+	
+	
 	
 
 	/**
