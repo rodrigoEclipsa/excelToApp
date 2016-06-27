@@ -16,6 +16,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.FormulaError;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.ss.util.CellReference;
 
@@ -27,7 +28,7 @@ import classes.WorkBookObject;
  * 
  * @author rodrigo
  */
-@SuppressWarnings("unchecked")
+
 public class ExcelBase
 {
 
@@ -408,6 +409,8 @@ public class ExcelBase
 	}
 	
 	
+	
+	
 	/**
 	 * devuelve cellData segun el CellName, este debe tener un formato
 	 * Libro!Sheet!CellRef donde Hoja1 es el nombre de la hoja y a1 es el nombre de la celda
@@ -442,31 +445,7 @@ public class ExcelBase
 	
 	}
 	
-	/*
-	protected Cell getCellByCellName(String cellName)
-	{
-		
-		Cell cell = null;
-		
-		CellData cellData = getCellDataByCellName(cellName);
-		
-		CellReference cellReference = new CellReference(cellData.cellRef);
-
-		Row row = cellData.sheet.getRow(cellReference.getRow());
-
-		//la fila puede no existir
-		if(row != null)
-		{
-			
-		cell = row.getCell(cellReference.getCol());
-		
-		}
-		
-		
-		return cell;
-		
-	}
-	*/
+	
 	
 	
 	protected Cell createCellBlank(String cellName)
@@ -497,5 +476,36 @@ public class ExcelBase
 		
 		
 	}
+	
+	/**
+	 * devuelve un array con todas las celdas que contienen formula
+	 * 
+	 */
+	public ArrayList<String> getAllFormulaCell(String fileName,String sheetName)
+	{
+		ArrayList<String> cells = new ArrayList<>();
+		
+		WorkBookObject workBookObject = getWorkBookObjectByName(fileName);
+		Sheet sheet = workBookObject.sheets.get(sheetName);
+		
+		CellReference cellReference;
+		
+		    for (Row r : sheet) 
+		    {
+		        for (Cell c : r) 
+		        {
+		            if (c.getCellType() == Cell.CELL_TYPE_FORMULA) 
+		            {
+		            	cellReference = new CellReference(c);
+		            	cells.add(fileName+"!"+sheetName+"!"+cellReference.formatAsString());
+		            }
+		        }
+		    }
+		
+		    return cells;
+		    
+	}
+	
+	
 
 }

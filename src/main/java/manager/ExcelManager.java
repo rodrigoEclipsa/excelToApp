@@ -15,7 +15,7 @@ import com.eclipsesource.json.JsonValue;
 import classes.CellData;
 import classes.WorkBookInfo;
 
-@SuppressWarnings("unchecked")
+
 public class ExcelManager extends ExcelBase
 {
 
@@ -62,12 +62,14 @@ public class ExcelManager extends ExcelBase
 		
 		case 0:
 
+			if(sentData.get("calculableVar") != null)
+			{
 			JsonObject calculableVar =  sentData
 					.get("calculableVar").asObject();
 			
 			setCalculableVar(calculableVar,false);
 			
-
+			}
 			nextProcess();
 
 			break;
@@ -76,17 +78,40 @@ public class ExcelManager extends ExcelBase
 			
 			if(sentData.get("requestResult") != null)
 			{
+				JsonArray requestResult = sentData.get("requestResult").asArray();
+			
+				////////busco comodin * 
+			   if(!requestResult.isEmpty())
+			   {
 				
-			JsonArray requestResult = sentData.get("requestResult").asArray();
-			resultData.add("calculateResult", getResult(requestResult));
-
-			nextProcess();
+				  String[] firstElement = requestResult.get(0).asString().split("!");
+				  String fileName = firstElement[0];
+				  String sheetName = firstElement[1];
+				  String cellName =firstElement[2];
+				
+				if(cellName.equals("*"))
+				{
+					resultData.add("calculateResult", getResult(getAllFormulaCell(fileName, sheetName)));	
+				}
+				else
+				{
+					resultData.add("calculateResult", getResult(requestResult));	
+				}
+			   
+			   }
+			   else
+			   {
+				   //si esta vacio igual genero el objeto(vacio)
+				   resultData.add("calculateResult", getResult(requestResult));	   
+			   }
+			
+			
 			
 			}
 			
-			break;
+			nextProcess();
 			
-		
+			break;
 		
 		case 2:
 
@@ -94,16 +119,11 @@ public class ExcelManager extends ExcelBase
 			if (sentData.get("nInstances") != null)
 			{
 				
-				
-
 				resultData.add("nInstances", getResultDinamicComponent());
-				
 			
 			}
 		
-			
 			nextProcess();
-			
 			
 			break;
 			
@@ -410,13 +430,11 @@ public class ExcelManager extends ExcelBase
 		for (JsonValue requestResultItem : requestResult)
 		{
 
-			
-			
 			CellData cellValue = this.getCellValue(requestResultItem.asString());
 
 			calculateResult.set(requestResultItem.asString(), cellValue.value);
 
-			System.out.println(requestResultItem.toString() + " : " + cellValue.value);
+			//System.out.println(requestResultItem.toString() + " : " + cellValue.value);
 			
 		}
 
@@ -424,6 +442,29 @@ public class ExcelManager extends ExcelBase
 		return calculateResult;
 
 	}
+	
+	private JsonObject getResult(ArrayList<String> requestResult) 
+	{
+
+		JsonObject calculateResult = new JsonObject();
+
+		// recorro todas las celdas que se requieren obtener
+		for (String requestResultItem : requestResult)
+		{
+
+			CellData cellValue = this.getCellValue(requestResultItem);
+
+			calculateResult.set(requestResultItem, cellValue.value);
+
+			//System.out.println(requestResultItem.toString() + " : " + cellValue.value);
+			
+		}
+
+		
+		return calculateResult;
+
+	}
+
 
 	
 	
