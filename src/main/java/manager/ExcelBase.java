@@ -222,8 +222,6 @@ public class ExcelBase
 		case Cell.CELL_TYPE_ERROR:
 
 			cellData.error = FormulaError.forInt(cellData.cell.getErrorCellValue()).name();
-			
-			
 			cellData.value = "ERROR";
 
 			break;
@@ -270,7 +268,7 @@ public class ExcelBase
 	}
 
 
-	protected CellData getCellValue(String cellName) 
+	protected CellData getCellData(String cellName) 
 	{
 
 	
@@ -310,7 +308,7 @@ public class ExcelBase
 	protected void printCell(String cellName)
 	{
 		
-		System.out.println(cellName+" "+ getCellValue(cellName).value);
+		System.out.println(cellName+" "+ getCellData(cellName).value);
 		
 	}
 	
@@ -494,11 +492,10 @@ public class ExcelBase
 		    {
 		        for (Cell c : r) 
 		        {
-		            if (c.getCellType() == Cell.CELL_TYPE_FORMULA) 
-		            {
+		           
 		            	cellReference = new CellReference(c);
 		            	cells.add(fileName+"!"+sheetName+"!"+cellReference.formatAsString());
-		            }
+		            
 		        }
 		    }
 		

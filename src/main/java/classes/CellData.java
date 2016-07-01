@@ -16,6 +16,7 @@ public class CellData
 	 */
 	public String value;
 	
+
 	/**
 	 * hoja 
 	 */
@@ -36,6 +37,8 @@ public class CellData
 	 * cell ref
 	 */
 	public Cell cell;
+	
+	
 	
 	
 }

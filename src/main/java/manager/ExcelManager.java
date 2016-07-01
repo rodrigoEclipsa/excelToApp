@@ -22,6 +22,10 @@ public class ExcelManager extends ExcelBase
 	private JsonObject sentData;
 	public JsonObject resultData = new JsonObject();
 
+	
+	public static int JSON_NUMBER = 2;
+	public static int JSON_BOOLEAN = 3;
+	public static int JSON_STRING = 1;
 
 	private int processStadge = 0;
 
@@ -80,7 +84,8 @@ public class ExcelManager extends ExcelBase
 			{
 				JsonArray requestResult = sentData.get("requestResult").asArray();
 			
-				////////busco comodin * 
+				////////busco comodin *, sirve para calcular todas las celdas con formulas
+				//y las calcula
 			   if(!requestResult.isEmpty())
 			   {
 				
@@ -287,7 +292,7 @@ public class ExcelManager extends ExcelBase
 			
 			
 			calculateResult.add(calculableVarItemObj.get("setResult").asString()
-					, getCellValue(evaluateFormula).value);
+					, getCellData(evaluateFormula).value);
 			
 			
 		}
@@ -341,8 +346,6 @@ public class ExcelManager extends ExcelBase
 		{
 
 			setCalculableVar( calculableVarItem.asObject(),true);
-
-			
 			getResult = getResult(requestResult);
 
 			// si contiene un mapa de asignacion a columnas
@@ -365,7 +368,7 @@ public class ExcelManager extends ExcelBase
 						{
 							
 							String cellNameGen = mapResultColumnKey.getName()+indicateRowMap.toString();		
-							setCellValue(cellNameGen, getResult.get(getResultKey.getName()).asString(),false);
+							setCellValue(cellNameGen, getResult.get(getResultKey.getName()).toString(),false);
 							
 							continue;
 							
@@ -389,12 +392,12 @@ public class ExcelManager extends ExcelBase
         JsonArray resultAfterNinstances = nInstancesItem.asObject().get("resultAfterNinstances").asArray();
 		
 		JsonObject result = new JsonObject();
-		
+		CellData cellData = null;
 		for (JsonValue resultAfterNinstancesItem : resultAfterNinstances)
 		{
-			result.add(resultAfterNinstancesItem.asString(), 
-					getCellValue(resultAfterNinstancesItem.asString()).value);
-		
+			cellData = getCellData(resultAfterNinstancesItem.asString());
+			setValidTypeJson(resultAfterNinstancesItem.asString(),result,cellData.value);
+			
 		}
 		
 		resultObj.add("resultAfterNinstances", result);
@@ -417,7 +420,7 @@ public class ExcelManager extends ExcelBase
 	 * recibe un array de celdas para calcular y obtener
 	 * 
 	 * @param requestResult
-	 * @param notifyAll
+	 *
 	 * si es true se notifican cambios en todas las celdas
 	 * @return
 	 */
@@ -430,10 +433,10 @@ public class ExcelManager extends ExcelBase
 		for (JsonValue requestResultItem : requestResult)
 		{
 
-			CellData cellValue = this.getCellValue(requestResultItem.asString());
-
-			calculateResult.set(requestResultItem.asString(), cellValue.value);
-
+			CellData cellData = this.getCellData(requestResultItem.asString());
+			setValidTypeJson(requestResultItem.asString(),calculateResult,cellData.value);
+			
+		
 			//System.out.println(requestResultItem.toString() + " : " + cellValue.value);
 			
 		}
@@ -441,6 +444,36 @@ public class ExcelManager extends ExcelBase
 		
 		return calculateResult;
 
+	}
+	
+	/**
+	 * setea un json con formato valido a un jsonObject
+	 * @param cellRef
+	 * @param jsonObject
+	 * @param value
+	 */
+	private void setValidTypeJson(String cellRef,JsonObject jsonObject, String value)
+	{
+		
+		
+		switch(jsonValidType(value))
+		{
+		
+		case 1:
+			jsonObject.set(cellRef, value);
+			break;
+		case 2:
+			jsonObject.set(cellRef, Double.parseDouble(value));
+			break;
+		case 3:
+			jsonObject.set(cellRef, Boolean.getBoolean(value));
+			break;
+	
+			default:
+				jsonObject.set(cellRef, value);
+		}
+		
+		
 	}
 	
 	private JsonObject getResult(ArrayList<String> requestResult) 
@@ -452,9 +485,9 @@ public class ExcelManager extends ExcelBase
 		for (String requestResultItem : requestResult)
 		{
 
-			CellData cellValue = this.getCellValue(requestResultItem);
-
-			calculateResult.set(requestResultItem, cellValue.value);
+			CellData cellData = this.getCellData(requestResultItem);
+			
+			setValidTypeJson(requestResultItem,calculateResult,cellData.value);
 
 			//System.out.println(requestResultItem.toString() + " : " + cellValue.value);
 			
@@ -466,7 +499,39 @@ public class ExcelManager extends ExcelBase
 	}
 
 
+	/**
+	 * devuelve un entero que indica que tipo de dato json valido, por defecto es JSON_STRING
+	 * 
+	 * 
+	 * 
+	 * @param value
+	 * @return
+	 * 
+	 * 1- String
+	 * 2- Number
+	 * 3- boolean
+	 * 
+	 */
 	
+	private int jsonValidType(String value)
+	{
+		
+		
+		if(isNumeric(value))
+		{
+			return JSON_NUMBER;
+		}
+		
+		if(value.equals("true") || value.equals("false"))
+		{
+			return JSON_BOOLEAN;
+		}
+		
+	
+		
+		return JSON_STRING;
+		
+	}
 	
 
 }
