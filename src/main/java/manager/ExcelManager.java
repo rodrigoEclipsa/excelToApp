@@ -136,12 +136,20 @@ public class ExcelManager extends ExcelBase
 			
 			if(sentData.get("dataTable") != null)
 			{
+			
+				if(resultData.get("calculateResult") == null)
+				{
+					JsonArray calculateResult = new JsonArray();
+					resultData.add("calculateResult", calculateResult);
+				}
 				
-				JsonObject dataTable = new JsonObject();
+				getResultDataTable(resultData.get("calculateResult").asObject());
+					
+				//JsonObject dataTable = new JsonObject();
 				
-				dataTable.add("calculateResult",getResultDataTable());
+			//	dataTable.add("calculateResult",getResultDataTable());
 				
-			    resultData.add("dataTable", dataTable);
+			   // resultData.add("dataTable", dataTable);
 			
 			}
 			
@@ -245,32 +253,41 @@ public class ExcelManager extends ExcelBase
 	
 	
 	
-
-	private JsonObject getResultDataTable() 
+   /**
+    * 
+    * @return
+    * devuelve un objeto que reprecenta todos los resultados de las tablas de datos
+    */
+	private void getResultDataTable(JsonObject calculateResult)
 	{
 
-		JsonObject calculateResult = new JsonObject();
+		JsonArray dataTable =  sentData.get("dataTable").asArray();
 		
-		JsonObject dataTable =  sentData.get("dataTable").asObject();
+		for (JsonValue dataTableItem : dataTable)
+		{
+			
 		
-		String evaluateFormula = dataTable.get("evaluateFormula").asString();
-		String cellInput0 = dataTable.get("cellInput0").asString();
-		String cellInput1 = dataTable.get("cellInput1").asString();
+		String evaluateFormula = dataTableItem.asObject().get("evaluateFormula").asString();
+		String cellInput0 = dataTableItem.asObject().get("cellInput0") != null ?
+				dataTableItem.asObject().get("cellInput0").asString() : null;
+		String cellInput1 = dataTableItem.asObject().get("cellInput1") != null ?
+				dataTableItem.asObject().get("cellInput1").asString() : null;
 		
-		JsonArray calculableVar = dataTable.get("calculableVar").asArray();
+		//guardo los valores de las celdas para restaurarlo para el proximo ciclo
+		CellData cellDataInput0 = getCellData(cellInput0);
+		CellData cellDataInput1 = getCellData(cellInput1);
+		
+				
+		JsonArray calculableVar = dataTableItem.asObject().get("calculableVar").asArray();
 		
 		//String evaluateFormula = (String)dataTable.get("evaluateFormula");
 		
-		
 		//notifyUpdateCell(cellName);
-		
 		
 		for (JsonValue calculableVarItem : calculableVar)
 		{
 			
 			JsonObject calculableVarItemObj =  calculableVarItem.asObject();
-			
-			
 			
 			if(!calculableVarItemObj.get("input0").isNull())
 			{
@@ -281,7 +298,6 @@ public class ExcelManager extends ExcelBase
 						true);
 			}
 			
-			
 			if(!calculableVarItemObj.get("input1").isNull())
 			{
 			
@@ -289,17 +305,22 @@ public class ExcelManager extends ExcelBase
 						calculableVarItemObj.get("input1").toString(), 
 						true);
 			}
-			
-			
+				
 			calculateResult.add(calculableVarItemObj.get("setResult").asString()
 					, getCellData(evaluateFormula).value);
 			
 			
 		}
 		
+		//restaurar valores de las celdas
+		if(cellInput0 != null)
+		setCellValue(cellInput0, cellDataInput0.value,true);
+		if(cellInput1 != null)
+		setCellValue(cellInput1, cellDataInput1.value,true);
+		
+		}
 		
 		
-		return calculateResult;
 		
 		
 	}

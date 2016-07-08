@@ -34,6 +34,7 @@
 
 
 "dataTable":
+[
 {
 
 
@@ -65,8 +66,37 @@
 ]
 
 
+},
+
+{
+
+
+"evaluateFormula":"flvarporcentual.xls!ppal!t80",
+"cellInput0":"flvarporcentual.xls!ppal!e5",
+"cellInput1":"flvarporcentual.xls!ppal!m30",
+
+
+"calculableVar":
+[
+
+{
+
+"input0":0.8,
+"input1":600,
+
+"setResult":"flvarporcentual.xls!ppal!u81"
+
 }
 
+
+
+
+
+]
+
+
+}
+]
 
 
 

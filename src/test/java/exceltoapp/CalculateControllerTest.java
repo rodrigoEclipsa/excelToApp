@@ -58,8 +58,6 @@ public class CalculateControllerTest extends TestBase
 		
 		System.out.println("fileContent : " + fileContent);
 		
-	
-
 		  		TestResponse res = request("POST", "/calculate/1/1",fileContent);
 		  		
 		  		//JsonObject json = res.json();
@@ -80,7 +78,6 @@ public class CalculateControllerTest extends TestBase
 		System.out.println("fileContent : " + fileContent);
 		
 	
-
 		  		TestResponse res = request("POST", "/calculate/1/1",fileContent);
 		  		
 		  		//JsonObject json = res.json();

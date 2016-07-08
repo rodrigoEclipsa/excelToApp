@@ -97,7 +97,7 @@ public class CalculateController
 				workBookInfo.fileName = workBookItem.asObject().get("fileName").asString();
 				//ruta del excel
 				workBookInfo.path = Conf.spreadsheetPath+"/"+clientId+"/"+groupappId+"/"+workBookItem.asObject().get("fileName").asString();
-	
+	           System.out.println("se busca el archivo... " + workBookInfo.path);
 				workBookInfo.sheetsNames = GeneralUtil.getArrayString(workBookItem.asObject().get("sheetsNames").asArray());
 				
 			    arrWorkBookInfo.add(workBookInfo);
