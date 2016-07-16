@@ -32,9 +32,12 @@ public class CalculateController
 		
 		
 
-		before((request, response) -> {
+		before((request, response) -> 
+		{
 			
-			
+	   	  response.header("Access-Control-Allow-Origin", "*");
+	      response.header("Access-Control-Request-Method","POST");
+	      response.header("Access-Control-Allow-Headers","*" );
 			
 		   // boolean authenticated = true;
 		     
@@ -53,8 +56,7 @@ public class CalculateController
 			
 		
 		
-		
-		
+	
 		
 		
 		
@@ -76,6 +78,8 @@ public class CalculateController
     	 post("/calculate/:client_id/:groupapp_id", (request, response) -> 
     	 {
     		 
+    		 
+    		
     		 System.out.println(request.headers("token"));
     		
     		 String clientId = request.params(":client_id");
