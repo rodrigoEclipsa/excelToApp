@@ -89,6 +89,25 @@ public class CalculateControllerTest extends TestBase
 	}
 	
 	
+	@Test
+	public void dFunctionsCalculate() throws IOException
+	{
+		
+		String fileContent = getJsonFile("dFunctions.json");
+		
+		System.out.println("fileContent : " + fileContent);
+		
+	
+		  		TestResponse res = request("POST", "/calculate/1/1",fileContent);
+		  		
+		  		//JsonObject json = res.json();
+
+		  		System.out.println("se recibio : \n" +GeneralUtil.prettyPrintJSONAsString(res.body));
+
+		  		assertEquals(200, res.status);
+
+	}
+	
 	
 
 }

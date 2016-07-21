@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.formula.WorkbookEvaluator;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.FormulaError;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
@@ -23,6 +24,7 @@ import org.apache.poi.ss.util.CellReference;
 import classes.CellData;
 import classes.WorkBookInfo;
 import classes.WorkBookObject;
+import customFunction.DAVERAGE;
 
 /**
  * 
@@ -55,10 +57,15 @@ public class ExcelBase
 		// "org.apache.poi.util.SystemOutLogger");
 		// System.setProperty ("poi.log.level", POILogger.INFO + "");
 		// evaluator.setDebugEvaluationOutputForNextEval(true);
-
+		//Collection<String> unsupportedFuncs = WorkbookEvaluator.getNotSupportedFunctionNames ();
+		//agrego funciones personalizadas
+		WorkbookEvaluator.registerFunction("DAVERAGE", new DAVERAGE());
+		
 		FileInputStream fis;
 		WorkBookObject workBookObject;
 		Map<String,FormulaEvaluator> workbooksEvaluator = new HashMap<String, FormulaEvaluator>();
+		
+		
 		
 		for (WorkBookInfo workBookInfoItem : arrWorkBookInfo)
 		{
@@ -82,6 +89,7 @@ public class ExcelBase
 			workbooksEvaluator.put(workBookInfoItem.fileName, workBookObject.evaluator);
 			
 			arrWorkBookObject.add(workBookObject);
+			
 			
 		}
        
