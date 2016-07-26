@@ -475,23 +475,23 @@ public class ExcelManager extends ExcelBase
 	 */
 	private void setValidTypeJson(String cellRef,JsonObject jsonObject, String value)
 	{
+		int jsonValidType = jsonValidType(value);
 		
-		
-		switch(jsonValidType(value))
+		if(jsonValidType == JSON_STRING)
 		{
-		
-		case 1:
 			jsonObject.set(cellRef, value);
-			break;
-		case 2:
+		}
+		else if(jsonValidType == JSON_NUMBER)
+		{
 			jsonObject.set(cellRef, Double.parseDouble(value));
-			break;
-		case 3:
+		}
+		else if(jsonValidType == JSON_BOOLEAN)
+		{
 			jsonObject.set(cellRef, Boolean.getBoolean(value));
-			break;
-	
-			default:
-				jsonObject.set(cellRef, value);
+		}
+		else
+		{
+			jsonObject.set(cellRef, value);
 		}
 		
 		
@@ -537,6 +537,10 @@ public class ExcelManager extends ExcelBase
 	private int jsonValidType(String value)
 	{
 		
+		if(value == null)
+		{
+			return JSON_STRING;
+		}
 		
 		if(isNumeric(value))
 		{
