@@ -2,18 +2,19 @@ package controller;
 
 import static spark.Spark.after;
 import static spark.Spark.before;
+import static spark.Spark.get;
 import static spark.Spark.post;
 
 import java.util.ArrayList;
+
+import org.apache.oltu.oauth2.client.request.OAuthClientRequest;
+import org.eclipse.jetty.server.ServletResponseHttpWrapper;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
-import com.github.scribejava.core.builder.ServiceBuilder;
-import com.github.scribejava.core.oauth.OAuth20Service;
 
-import OAuth.ExcelToAppAPI;
 import classes.WorkBookInfo;
 import conf.Conf;
 import manager.ExcelManager;
@@ -70,6 +71,14 @@ public class CalculateController
       String flange  = request.getParameter("flange");  
     	 */
     	
+		 get("/callbackauth", (request, response) -> 
+    	 {
+    		 System.out.println("auth: " + request.body());
+    	
+    		 return "";
+    		 
+    	 });
+		
     	
     	 /**
     	  * 
@@ -81,18 +90,19 @@ public class CalculateController
     	 post("/calculate/:client_id/:groupapp_id", (request, response) -> 
     	 {
     		 
+    		 OAuthClientRequest requestauth = OAuthClientRequest
+    				   .authorizationLocation("http://exceltoapp.eclipsa.com.ar/administration/oauth2/authorize")
+    				   .setClientId("test")
+    				   .setRedirectURI("localhost:4567/callbackauth")
+    				   .buildQueryMessage();
+    	
     		
-    		 final OAuth20Service service = new ServiceBuilder()
-    				 
-                     .apiKey("your_api_key")
-                     
-                     .apiSecret("your_api_secret")
-                   
-                     .build(new ExcelToAppAPI());
-    		 
-    		
-    		 System.out.println(request.headers("token"));
-    		
+             System.out.println("auth uri: " + requestauth.getLocationUri());
+             
+             ServletResponseHttpWrapper sr = new ServletResponseHttpWrapper(response.raw());
+             sr.sendRedirect(requestauth.getLocationUri());
+             
+             //---------------------------
     		 String clientId = request.params(":client_id");
     		 String groupappId = request.params(":groupapp_Id");
     		
