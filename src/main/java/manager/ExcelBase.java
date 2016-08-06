@@ -48,8 +48,6 @@ public class ExcelBase
 	 * cambios en modificaciones posteriores
 	 */
 
-
-
 	protected ExcelBase(ArrayList<WorkBookInfo> arrWorkBookInfo) throws IOException, EncryptedDocumentException, InvalidFormatException
 	{
 
@@ -65,13 +63,10 @@ public class ExcelBase
 		WorkBookObject workBookObject;
 		Map<String,FormulaEvaluator> workbooksEvaluator = new HashMap<String, FormulaEvaluator>();
 		
-		
-		
 		for (WorkBookInfo workBookInfoItem : arrWorkBookInfo)
 		{
 				 
 			 workBookObject = new WorkBookObject();
-		
 			 workBookObject.workBookInfo = workBookInfoItem;
 		
 			 fis = new FileInputStream(workBookInfoItem.path);
@@ -90,7 +85,6 @@ public class ExcelBase
 			
 			arrWorkBookObject.add(workBookObject);
 			
-			
 		}
        
 		//asigno referencias todos a todos
@@ -99,24 +93,16 @@ public class ExcelBase
 			workBookObjectItem.evaluator.setupReferencedWorkbooks(workbooksEvaluator);
 		}
 	        
-	
-	
-		
 	}
 	
-	
-
 		protected void setCellValue(String cellName, String value,boolean notifyUpdate)
 		{
 			
 			boolean isNumeric = isNumeric(value);
-			
 			CellData cellData = getCellDataByCellName(cellName);
 
 			if(cellData.cell == null)
 				cellData.cell = createCellBlank(cellName);
-			
-			
 			//si es una formula cambio el tipo de celda para setear un numero
 			//es el caso de las celdas mixtas que pueden ser formula o un valor ingresado por el usuario
 			if (cellData.cell.getCellType() == Cell.CELL_TYPE_FORMULA)
@@ -128,11 +114,9 @@ public class ExcelBase
 				if(isNumeric)
 				{
 					cellData.cell.setCellType(Cell.CELL_TYPE_NUMERIC);
-				
 				}
 				else
 				{
-					
 					cellData.cell.setCellType(Cell.CELL_TYPE_STRING);	
 				}
 				
@@ -141,7 +125,6 @@ public class ExcelBase
 			
 			if(isNumeric)
 			{
-				
 				cellData.cell.setCellValue(Double.parseDouble(value));
 			}
 			else
@@ -150,30 +133,19 @@ public class ExcelBase
 				cellData.cell.setCellValue(value);
 			}
 		
-			
-				
-			
 				if(notifyUpdate)
 				{
 					this.notifyUpdateCell(cellData);
 					
 				}
 					
-			
 		}
 		
-
-		
-	
-	
-	
 	protected String getFormatString(String cellName)
 	{
 
 		String result = "";
 
-	
-		
 		CellData cellData = getCellDataByCellName(cellName);
 
 		//es nulo si la celda nunca se ha usado
@@ -190,10 +162,8 @@ public class ExcelBase
 	private CellData getCellValue(CellData cellData) 
 	{
 
-		
 		//CellData cellData = new CellData();
 	
-
 		if(cellData.cell != null)
 		{
 		// evaluator.evaluateFormulaCell(cell);
@@ -245,8 +215,6 @@ public class ExcelBase
 
 			// cellData.put("type",HSSFCell.CELL_TYPE_STRING);
 			cellData.value = cellData.cell.getCellStyle().getDataFormatString();
-			
-			
 
 		}
 
@@ -257,16 +225,13 @@ public class ExcelBase
 		{
 
 			Double perceValue = Double.parseDouble(cellData.value) * 100;
-			
 			cellData.value = perceValue.toString();
 
 		}
 
-		
 		}
 		else
 		{
-			
 			cellData.value = null;
 			
 		}
@@ -279,12 +244,10 @@ public class ExcelBase
 	protected CellData getCellData(String cellName) 
 	{
 
-	
 		CellData cellData = getCellDataByCellName(cellName);
 
 		return getCellValue(cellData);
 		
-	
 	}
 	
 	
@@ -355,24 +318,15 @@ public class ExcelBase
 	protected void notifyUpdateCell(String cellName)
 	{
 
-		
-
 		CellData cellData = getCellDataByCellName(cellName);
-
 		cellData.workBookObject.evaluator.notifyUpdateCell(cellData.cell);
 
-		
 	}
-	
-	
 	
 	protected void notifyUpdateCell(CellData cellData)
 	{
 
-		
 		cellData.workBookObject.evaluator.notifyUpdateCell(cellData.cell);
-
-		
 	}
 	
 	
@@ -441,11 +395,9 @@ public class ExcelBase
 		//la fila puede no existir
 		if(row != null)
 		{
-			
 			cellData.cell = row.getCell(cellReference.getCol());
-		
+			
 		}
-		
 		
 	  return cellData;
 	
@@ -479,8 +431,6 @@ public class ExcelBase
 		
 		return str.matches("[-+]?\\d*\\.?\\d+");
 
-		
-		
 	}
 	
 	/**
@@ -500,7 +450,7 @@ public class ExcelBase
 		    {
 		        for (Cell c : r) 
 		        {
-		           
+		         
 		            	cellReference = new CellReference(c);
 		            	cells.add(fileName+"!"+sheetName+"!"+cellReference.formatAsString());
 		            

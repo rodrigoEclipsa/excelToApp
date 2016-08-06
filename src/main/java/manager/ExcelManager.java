@@ -63,7 +63,6 @@ public class ExcelManager extends ExcelBase
 		switch (processStadge)
 		{
 
-		
 		case 0:
 
 			if(sentData.get("calculableVar") != null)
@@ -153,7 +152,6 @@ public class ExcelManager extends ExcelBase
 			
 			}
 			
-			
 			nextProcess();
 			
 		 break;
@@ -163,14 +161,11 @@ public class ExcelManager extends ExcelBase
 			
 		break;
 
-	
 		default:
 			
 			throw new Exception("no existe el proceso");
 
 		}
-
-		
 
 	}
 
@@ -240,18 +235,13 @@ public class ExcelManager extends ExcelBase
 		else
 		{
 
-			
-			
 			this.setCellValue(cellName,
 					valueCell,notifyUpdateAll);
-
 		}
 		
 
 	}
 
-	
-	
 	
    /**
     * 
@@ -266,7 +256,6 @@ public class ExcelManager extends ExcelBase
 		for (JsonValue dataTableItem : dataTable)
 		{
 			
-		
 		String evaluateFormula = dataTableItem.asObject().get("evaluateFormula").asString();
 		String cellInput0 = dataTableItem.asObject().get("cellInput0") != null ?
 				dataTableItem.asObject().get("cellInput0").asString() : null;
@@ -319,9 +308,6 @@ public class ExcelManager extends ExcelBase
 		setCellValue(cellInput1, cellDataInput1.value,true);
 		
 		}
-		
-		
-		
 		
 	}
 
@@ -426,8 +412,6 @@ public class ExcelManager extends ExcelBase
 		
 		}
 		
-		
-		
 		return resultComponents;
 
 	}
@@ -462,9 +446,7 @@ public class ExcelManager extends ExcelBase
 			
 		}
 
-		
 		return calculateResult;
-
 	}
 	
 	/**
@@ -494,7 +476,6 @@ public class ExcelManager extends ExcelBase
 			jsonObject.set(cellRef, value);
 		}
 		
-		
 	}
 	
 	private JsonObject getResult(ArrayList<String> requestResult) 
@@ -514,9 +495,7 @@ public class ExcelManager extends ExcelBase
 			
 		}
 
-		
 		return calculateResult;
-
 	}
 
 
@@ -551,8 +530,6 @@ public class ExcelManager extends ExcelBase
 		{
 			return JSON_BOOLEAN;
 		}
-		
-	
 		
 		return JSON_STRING;
 		

@@ -1,8 +1,5 @@
 package main;
 
-import static spark.SparkBase.port;
-import static spark.SparkBase.threadPool;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -12,6 +9,7 @@ import java.util.Properties;
 
 import conf.Conf;
 import controller.CalculateController;
+import spark.Spark;
 
 
 
@@ -27,8 +25,8 @@ public class Main {
     	int maxThreads = 8;
     	int minThreads = 2;
     	int timeOutMillis = 30000;
-    	threadPool(maxThreads, minThreads, timeOutMillis);
-    	port(4567);
+    	Spark.threadPool(maxThreads, minThreads, timeOutMillis);
+    	Spark.port(4567);
     	
     	//------------------------------
     	

@@ -10,7 +10,10 @@ import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
+import com.github.scribejava.core.builder.ServiceBuilder;
+import com.github.scribejava.core.oauth.OAuth20Service;
 
+import OAuth.ExcelToAppAPI;
 import classes.WorkBookInfo;
 import conf.Conf;
 import manager.ExcelManager;
@@ -78,6 +81,14 @@ public class CalculateController
     	 post("/calculate/:client_id/:groupapp_id", (request, response) -> 
     	 {
     		 
+    		
+    		 final OAuth20Service service = new ServiceBuilder()
+    				 
+                     .apiKey("your_api_key")
+                     
+                     .apiSecret("your_api_secret")
+                   
+                     .build(new ExcelToAppAPI());
     		 
     		
     		 System.out.println(request.headers("token"));
