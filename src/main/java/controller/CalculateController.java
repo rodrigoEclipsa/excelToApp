@@ -2,13 +2,9 @@ package controller;
 
 import static spark.Spark.after;
 import static spark.Spark.before;
-import static spark.Spark.get;
 import static spark.Spark.post;
 
 import java.util.ArrayList;
-
-import org.apache.oltu.oauth2.client.request.OAuthClientRequest;
-import org.eclipse.jetty.server.ServletResponseHttpWrapper;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
@@ -61,25 +57,39 @@ public class CalculateController
 		
 		
 	
-		
-		
-		
-    	/**
-    	 * 
-    	 *  String clientData  = request.getParameter("data");
-      String sheetName  = request.getParameter("sheetname");
-      String flange  = request.getParameter("flange");  
-    	 */
+	/*
     	
-		 get("/callbackauth", (request, response) -> 
+		 get("/calculate/login", (request, response) -> 
     	 {
-    		 System.out.println("auth: " + request.body());
-    	
+    		
+    		 OAuthClientRequest requestauth = OAuthClientRequest
+  				   .authorizationLocation("http://exceltoapp.eclipsa.com.ar/administration/oauth2/authorize")
+  				   .setClientId("test")
+  				   .setResponseType("code")
+  				   .setState("1235678")
+  				   .setRedirectURI("http://localhost:4567/calculate/login/callbackauth")
+  				   .buildQueryMessage();
+  	
+  		      response.redirect(requestauth.getLocationUri());
+  		      
+           System.out.println("auth uri: " + requestauth.getLocationUri());
+         
+    		
+           return "hola";
+ 		});
+		 */
+		/*
+		 get("/calculate/login/callbackauth", (request, response) -> 
+    	 {
+    		 
+    		 System.out.println(request.queryParams("code"));
+    		 System.out.println(request.queryParams("state"));
+    		 
     		 return "";
     		 
     	 });
-		
-    	
+		 */
+		 
     	 /**
     	  * 
     	  * peticion para calcular
@@ -90,18 +100,9 @@ public class CalculateController
     	 post("/calculate/:client_id/:groupapp_id", (request, response) -> 
     	 {
     		 
-    		 OAuthClientRequest requestauth = OAuthClientRequest
-    				   .authorizationLocation("http://exceltoapp.eclipsa.com.ar/administration/oauth2/authorize")
-    				   .setClientId("test")
-    				   .setRedirectURI("localhost:4567/callbackauth")
-    				   .buildQueryMessage();
-    	
-    		
-             System.out.println("auth uri: " + requestauth.getLocationUri());
-             
-             ServletResponseHttpWrapper sr = new ServletResponseHttpWrapper(response.raw());
-             sr.sendRedirect(requestauth.getLocationUri());
-             
+    		try
+    		{
+          
              //---------------------------
     		 String clientId = request.params(":client_id");
     		 String groupappId = request.params(":groupapp_Id");
@@ -110,9 +111,7 @@ public class CalculateController
     		
     		 //datos del head
     		 JsonObject headData = data.get("head").asObject();
-    	
     		 JsonArray workBooks = headData.get("workBooks").asArray();
-    		 
     		 ArrayList<WorkBookInfo> arrWorkBookInfo = new ArrayList<WorkBookInfo>();
    
     		 WorkBookInfo workBookInfo;
@@ -132,8 +131,17 @@ public class CalculateController
     		 ExcelManager excelManager = new ExcelManager(arrWorkBookInfo, data);
     		 excelManager.calculate();
     
+    		 return  excelManager.resultData.toString(); 
+    		}
+    		catch(Exception error)
+    		{
+    			error.printStackTrace();
+    			
+    			return "se produjo un error";
+    			
+    		}
     		 
-    		 return  excelManager.resultData.toString();
+    		
     		 
     		 
     		    

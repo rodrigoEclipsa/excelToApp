@@ -13,6 +13,17 @@ public class CalculateControllerTest extends TestBase
 
 	
 	@Test
+	public void testLogin() throws IOException
+	{
+		
+		TestResponse res = request("GET", "/calculate/login",null);
+  		//JsonObject json = res.json();
+		
+		 System.out.println("se recibio del login " +  res.body);
+       assertEquals(200, res.status);
+	}
+	
+	@Test
 	public void simpleCalculate() throws IOException
 	{
 		
@@ -28,6 +39,40 @@ public class CalculateControllerTest extends TestBase
 	
 	}
 
+	
+	@Test
+	public void econoagro_efectoPalanca() throws IOException
+	{
+		
+		String fileContent = getJsonFile("econoagro_efectoPalanca.json");
+		
+		System.out.println("fileContent : " + fileContent);
+		
+		TestResponse res = request("POST", "/calculate/1/1",fileContent);
+		  		//JsonObject json = res.json();
+		 System.out.println("se recibio : \n" + GeneralUtil.prettyPrintJSONAsString(res.body));
+
+		 assertEquals(200, res.status);
+	
+	}
+
+	
+	@Test
+	public void econoagro_feedLotCompra() throws IOException
+	{
+		
+		String fileContent = getJsonFile("econoagro_feedLotCompra.json");
+		
+		System.out.println("fileContent : " + fileContent);
+		
+		TestResponse res = request("POST", "/calculate/1/1",fileContent);
+		  		//JsonObject json = res.json();
+		 System.out.println("se recibio : \n" + GeneralUtil.prettyPrintJSONAsString(res.body));
+
+		 assertEquals(200, res.status);
+	
+	}
+	
 	
 	
 	@Test

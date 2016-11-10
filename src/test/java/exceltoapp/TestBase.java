@@ -85,17 +85,18 @@ public class TestBase
 			connection.connect();
 
 			//connection.setRequestProperty("Content-Type","application/json");  
-		
-
-			
+		    
+			if(body != null)
+			{
 			byte[] outputInBytes = body.getBytes("UTF-8");
 			OutputStream os = connection.getOutputStream();
 			os.write( outputInBytes );    
 			os.close();
-			
-			
+			}
 			String responseBody = IOUtils.toString(connection.getInputStream());
+			
 			return new TestResponse(connection.getResponseCode(), responseBody);
+			
 
 		} catch (IOException e)
 		{
@@ -109,13 +110,19 @@ public class TestBase
 	protected static class TestResponse
 	{
 
-		public final String body;
-		public final int status;
+		public String body;
+		public int status;
 
 		public TestResponse(int status, String body)
 		{
 			this.status = status;
 			this.body = body;
+		}
+		
+		public TestResponse(int status)
+		{
+			this.status = status;
+			
 		}
 
 		public JsonObject json()

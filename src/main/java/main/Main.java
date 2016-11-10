@@ -63,6 +63,7 @@ public class Main {
     	
        new CalculateController();
     	
+       System.out.println("server init...");
     
     
 }

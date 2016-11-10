@@ -1,0 +1,64 @@
+{
+
+
+"head":
+{
+
+"workBooks":
+[
+
+{
+"fileName":"cred_efpalanca.xls",
+"sheetsNames":["mz"]
+
+}
+]
+},
+
+
+"calculableVar":
+{
+
+
+},
+
+
+
+"requestResult":
+[
+
+
+ "cred_efpalanca.xls!mz!n16",
+
+		 "cred_efpalanca.xls!mz!d32",
+		 "cred_efpalanca.xls!mz!f32",
+		 "cred_efpalanca.xls!mz!h32",
+		 "cred_efpalanca.xls!mz!n32",
+		 "cred_efpalanca.xls!mz!p32",
+		 "cred_efpalanca.xls!mz!r32",
+
+		 "cred_efpalanca.xls!mz!d41",
+		 "cred_efpalanca.xls!mz!f41",
+		 "cred_efpalanca.xls!mz!h41",
+		 "cred_efpalanca.xls!mz!n41",
+		 "cred_efpalanca.xls!mz!p41",
+		 "cred_efpalanca.xls!mz!r41",
+
+		 "cred_efpalanca.xls!mz!d49",
+		 "cred_efpalanca.xls!mz!f49",
+		 "cred_efpalanca.xls!mz!h49",
+		 "cred_efpalanca.xls!mz!n49",
+		 "cred_efpalanca.xls!mz!p49",
+		 "cred_efpalanca.xls!mz!r49",
+
+		 "cred_efpalanca.xls!mz!f20",
+
+
+"cred_efpalanca.xls!mz!a3",
+"cred_efpalanca.xls!mz!a4",
+"cred_efpalanca.xls!mz!a1"
+]
+
+
+
+}

@@ -263,8 +263,13 @@ public class ExcelManager extends ExcelBase
 				dataTableItem.asObject().get("cellInput1").asString() : null;
 		
 		//guardo los valores de las celdas para restaurarlo para el proximo ciclo
-		CellData cellDataInput0 = getCellData(cellInput0);
-		CellData cellDataInput1 = getCellData(cellInput1);
+		CellData cellDataInput0 = null;
+		CellData cellDataInput1 = null;
+		if(cellInput0 != null)
+		cellDataInput0 = getCellData(cellInput0);
+	
+		if(cellInput1 != null)
+		cellDataInput1 = getCellData(cellInput1);
 		
 				
 		JsonArray calculableVar = dataTableItem.asObject().get("calculableVar").asArray();
@@ -287,12 +292,15 @@ public class ExcelManager extends ExcelBase
 						true);
 			}
 			
+			if(calculableVarItemObj.get("input1") != null)
+			{
 			if(!calculableVarItemObj.get("input1").isNull())
 			{
 			
 				setCalculableVar(cellInput1,
 						calculableVarItemObj.get("input1").toString(), 
 						true);
+			}
 			}
 				
 			calculateResult.add(calculableVarItemObj.get("setResult").asString()

@@ -12,7 +12,6 @@ import java.util.Map;
 
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.ss.formula.WorkbookEvaluator;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.FormulaError;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
@@ -24,7 +23,7 @@ import org.apache.poi.ss.util.CellReference;
 import classes.CellData;
 import classes.WorkBookInfo;
 import classes.WorkBookObject;
-import customFunction.DAVERAGE;
+import conf.Conf;
 
 /**
  * 
@@ -57,7 +56,7 @@ public class ExcelBase
 		// evaluator.setDebugEvaluationOutputForNextEval(true);
 		//Collection<String> unsupportedFuncs = WorkbookEvaluator.getNotSupportedFunctionNames ();
 		//agrego funciones personalizadas
-		WorkbookEvaluator.registerFunction("DAVERAGE", new DAVERAGE());
+		//WorkbookEvaluator.registerFunction("DAVERAGE", new DAVERAGE());
 		
 		FileInputStream fis;
 		WorkBookObject workBookObject;
@@ -379,9 +378,11 @@ public class ExcelBase
 	private CellData getCellDataByCellName(String cellName)
 	{
 		
+	
+	
 		CellData cellData = new CellData();
 	
-		String[] cellNameSplit = cellName.split("!");
+		String[] cellNameSplit = cellName.split(Conf.splitStr);
 		
 		WorkBookObject workBookObject = getWorkBookObjectByName(cellNameSplit[0]);
 		cellData.workBookObject = workBookObject;
@@ -452,7 +453,7 @@ public class ExcelBase
 		        {
 		         
 		            	cellReference = new CellReference(c);
-		            	cells.add(fileName+"!"+sheetName+"!"+cellReference.formatAsString());
+		            	cells.add(fileName+Conf.splitStr+sheetName+Conf.splitStr+cellReference.formatAsString());
 		            
 		        }
 		    }
