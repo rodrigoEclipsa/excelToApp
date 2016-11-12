@@ -130,8 +130,11 @@ public class CalculateController
     		 
     		 ExcelManager excelManager = new ExcelManager(arrWorkBookInfo, data);
     		 excelManager.calculate();
-    
-    		 return  excelManager.resultData.toString(); 
+    		 
+    		 String jsonOutput = excelManager.resultData.toString();
+             System.out.println("json output :\n " + jsonOutput);
+             
+    		 return  jsonOutput; 
     		}
     		catch(Exception error)
     		{

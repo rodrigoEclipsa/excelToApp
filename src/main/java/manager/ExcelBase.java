@@ -435,6 +435,19 @@ public class ExcelBase
 	}
 	
 	/**
+	 * si el string tiene formato de celda excel
+	 * nombreLibro!nombreHoja!celdaCordenada
+	 * @param str
+	 * @return
+	 */
+	protected boolean isVariableExcel(String str)
+	{
+		
+		return str.matches("^.*!.*!.*");
+
+	}
+	
+	/**
 	 * devuelve un array con todas las celdas que contienen formula
 	 * 
 	 */

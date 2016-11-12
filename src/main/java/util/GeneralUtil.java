@@ -23,7 +23,7 @@ public class GeneralUtil
 		
 		for (JsonValue jsonValue : jsonArray)
 		{
-			data.add(jsonValue.asString());
+			data.add(jsonValue.toString());
 		}
 		
 		return data;

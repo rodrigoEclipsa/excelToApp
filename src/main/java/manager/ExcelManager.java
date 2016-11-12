@@ -283,23 +283,32 @@ public class ExcelManager extends ExcelBase
 			
 			JsonObject calculableVarItemObj =  calculableVarItem.asObject();
 			
+			if(calculableVarItemObj.get("input0") != null)
+			{
 			if(!calculableVarItemObj.get("input0").isNull())
 			{
-			
-				
+			    String cellInput0Value = calculableVarItemObj.get("input0").asString();
+			 
+			    
 				setCalculableVar(cellInput0,
-						calculableVarItemObj.get("input0").toString() , 
-						true);
+						isVariableExcel(cellInput0Value) ?  getCellData(cellInput0Value).value :
+						calculableVarItemObj.get("input0").asString()
+						,true);
+				
+			    
+			}
 			}
 			
 			if(calculableVarItemObj.get("input1") != null)
 			{
 			if(!calculableVarItemObj.get("input1").isNull())
 			{
-			
+				 String cellInput1Value = calculableVarItemObj.get("input1").asString();
+				
 				setCalculableVar(cellInput1,
-						calculableVarItemObj.get("input1").toString(), 
-						true);
+						isVariableExcel(cellInput1Value) ?  getCellData(cellInput1Value).value :
+							calculableVarItemObj.get("input1").asString()
+						,true);
 			}
 			}
 				
