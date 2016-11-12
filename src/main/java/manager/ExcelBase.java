@@ -24,6 +24,7 @@ import classes.CellData;
 import classes.WorkBookInfo;
 import classes.WorkBookObject;
 import conf.Conf;
+import util.GeneralUtil;
 
 /**
  * 
@@ -97,7 +98,7 @@ public class ExcelBase
 		protected void setCellValue(String cellName, String value,boolean notifyUpdate)
 		{
 			
-			boolean isNumeric = isNumeric(value);
+			boolean isNumeric = GeneralUtil.isNumeric(value);
 			CellData cellData = getCellDataByCellName(cellName);
 
 			if(cellData.cell == null)
@@ -427,25 +428,7 @@ public class ExcelBase
 		
 	}
 
-	protected boolean isNumeric(String str)
-	{
-		
-		return str.matches("[-+]?\\d*\\.?\\d+");
-
-	}
 	
-	/**
-	 * si el string tiene formato de celda excel
-	 * nombreLibro!nombreHoja!celdaCordenada
-	 * @param str
-	 * @return
-	 */
-	protected boolean isVariableExcel(String str)
-	{
-		
-		return str.matches("^.*!.*!.*");
-
-	}
 	
 	/**
 	 * devuelve un array con todas las celdas que contienen formula

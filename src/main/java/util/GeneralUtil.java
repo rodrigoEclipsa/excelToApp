@@ -15,7 +15,25 @@ public class GeneralUtil
 		return JsonUtil::toJson;
 		}
 	*/
+	public static boolean isNumeric(String str)
+	{
+		
+		return str.matches("[-+]?\\d*\\.?\\d+");
+
+	}
 	
+	/**
+	 * si el string tiene formato de celda excel
+	 * nombreLibro!nombreHoja!celdaCordenada
+	 * @param str
+	 * @return
+	 */
+	public static boolean isVariableExcel(String str)
+	{
+		
+		return str.matches("^.*!.*!.*");
+
+	}
 	
 	public static ArrayList<String> getArrayString(JsonArray jsonArray)
 	{
@@ -23,7 +41,11 @@ public class GeneralUtil
 		
 		for (JsonValue jsonValue : jsonArray)
 		{
-			data.add(jsonValue.toString());
+			
+			data.add(
+					isNumeric(jsonValue.toString()) ? jsonValue.toString() :
+						jsonValue.asString()
+					);
 		}
 		
 		return data;

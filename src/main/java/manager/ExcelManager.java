@@ -14,6 +14,7 @@ import com.eclipsesource.json.JsonValue;
 
 import classes.CellData;
 import classes.WorkBookInfo;
+import util.GeneralUtil;
 
 
 public class ExcelManager extends ExcelBase
@@ -224,7 +225,7 @@ public class ExcelManager extends ExcelBase
 		Double calculateAux;
 		
 		if (cellExcelFormat.contains("%")
-				&& isNumeric(valueCell))
+				&& GeneralUtil.isNumeric(valueCell))
 		{
 
 			calculateAux = Double.parseDouble(valueCell) / 100;
@@ -287,12 +288,13 @@ public class ExcelManager extends ExcelBase
 			{
 			if(!calculableVarItemObj.get("input0").isNull())
 			{
-			    String cellInput0Value = calculableVarItemObj.get("input0").asString();
-			 
-			    
+			    String cellInput0Value =GeneralUtil.isNumeric(calculableVarItemObj.get("input0").toString()) ?
+			    		calculableVarItemObj.get("input0").toString() : calculableVarItemObj.get("input0").asString();
+
+               
 				setCalculableVar(cellInput0,
-						isVariableExcel(cellInput0Value) ?  getCellData(cellInput0Value).value :
-						calculableVarItemObj.get("input0").asString()
+						GeneralUtil.isVariableExcel(cellInput0Value) ?  getCellData(cellInput0Value).value :
+							cellInput0Value
 						,true);
 				
 			    
@@ -303,11 +305,13 @@ public class ExcelManager extends ExcelBase
 			{
 			if(!calculableVarItemObj.get("input1").isNull())
 			{
-				 String cellInput1Value = calculableVarItemObj.get("input1").asString();
+				String cellInput1Value =GeneralUtil.isNumeric(calculableVarItemObj.get("input1").toString()) ?
+			    		calculableVarItemObj.get("input1").toString() : calculableVarItemObj.get("input1").asString();
+
 				
 				setCalculableVar(cellInput1,
-						isVariableExcel(cellInput1Value) ?  getCellData(cellInput1Value).value :
-							calculableVarItemObj.get("input1").asString()
+						GeneralUtil.isVariableExcel(cellInput1Value) ?  getCellData(cellInput1Value).value :
+							cellInput1Value
 						,true);
 			}
 			}
@@ -538,7 +542,7 @@ public class ExcelManager extends ExcelBase
 			return JSON_STRING;
 		}
 		
-		if(isNumeric(value))
+		if(GeneralUtil.isNumeric(value))
 		{
 			return JSON_NUMBER;
 		}
