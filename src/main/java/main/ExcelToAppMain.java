@@ -13,7 +13,7 @@ import spark.Spark;
 
 
 
-public class Main {
+public class ExcelToAppMain {
 	
 
 	

@@ -15,7 +15,7 @@ import org.junit.BeforeClass;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 
-import main.Main;
+import main.ExcelToAppMain;
 import spark.Spark;
 import spark.utils.IOUtils;
 
@@ -27,7 +27,7 @@ public class TestBase
 	@BeforeClass
 	public static void beforeClass()
 	{
-		Main.main(null);
+		ExcelToAppMain.main(null);
 	}
 
 	@AfterClass
