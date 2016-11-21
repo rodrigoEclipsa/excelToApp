@@ -16,7 +16,7 @@ public class CalculateControllerTest extends TestBase
 	public void testLogin() throws IOException
 	{
 		
-		TestResponse res = request("GET", "/calculate/login",null);
+		TestResponse res = request("GET", "/calculate/login",null,false);
   		//JsonObject json = res.json();
 		
 		 System.out.println("se recibio del login " +  res.body);
@@ -31,7 +31,7 @@ public class CalculateControllerTest extends TestBase
 		
 		System.out.println("fileContent : " + fileContent);
 		
-		TestResponse res = request("POST", "/calculate/1/1",fileContent);
+		TestResponse res = request("POST", "/calculate/1/1",fileContent,false);
 		  		//JsonObject json = res.json();
 		 System.out.println("se recibio : \n" + GeneralUtil.prettyPrintJSONAsString(res.body));
 
@@ -48,7 +48,7 @@ public class CalculateControllerTest extends TestBase
 		
 		System.out.println("fileContent : " + fileContent);
 		
-		TestResponse res = request("POST", "/calculate/1/1",fileContent);
+		TestResponse res = request("POST", "/calculate/1/1",fileContent,false);
 		  		//JsonObject json = res.json();
 		 System.out.println("se recibio : \n" + GeneralUtil.prettyPrintJSONAsString(res.body));
 
@@ -65,7 +65,7 @@ public class CalculateControllerTest extends TestBase
 		
 		System.out.println("fileContent : " + fileContent);
 		
-		TestResponse res = request("POST", "/calculate/1/1",fileContent);
+		TestResponse res = request("POST", "/calculate/1/1",fileContent,false);
 		  		//JsonObject json = res.json();
 		 System.out.println("se recibio : \n" + GeneralUtil.prettyPrintJSONAsString(res.body));
 
@@ -85,7 +85,7 @@ public class CalculateControllerTest extends TestBase
 		
 		System.out.println("fileContent : " + fileContent);
 		
-		  		TestResponse res = request("POST", "/calculate/1/1",fileContent);
+		  		TestResponse res = request("POST", "/calculate/1/1",fileContent,false);
 		  		
 		  		//JsonObject json = res.json();
 
@@ -105,7 +105,7 @@ public class CalculateControllerTest extends TestBase
 		
 		System.out.println("fileContent : " + fileContent);
 		
-		  		TestResponse res = request("POST", "/calculate/1/1",fileContent);
+		  		TestResponse res = request("POST", "/calculate/1/1",fileContent,false);
 		  		
 		  		//JsonObject json = res.json();
 
@@ -125,7 +125,7 @@ public class CalculateControllerTest extends TestBase
 		System.out.println("fileContent : " + fileContent);
 		
 	
-		  		TestResponse res = request("POST", "/calculate/1/1",fileContent);
+		  		TestResponse res = request("POST", "/calculate/1/1",fileContent,false);
 		  		
 		  		//JsonObject json = res.json();
 
@@ -145,7 +145,7 @@ public class CalculateControllerTest extends TestBase
 		System.out.println("fileContent : " + fileContent);
 		
 	
-		  		TestResponse res = request("POST", "/calculate/1/1",fileContent);
+		  		TestResponse res = request("POST", "/calculate/1/1",fileContent,false);
 		  		
 		  		//JsonObject json = res.json();
 

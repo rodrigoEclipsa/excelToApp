@@ -12,9 +12,6 @@ import java.net.URL;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
-import com.eclipsesource.json.Json;
-import com.eclipsesource.json.JsonObject;
-
 import main.ExcelToAppMain;
 import spark.Spark;
 import spark.utils.IOUtils;
@@ -36,11 +33,11 @@ public class TestBase
 		Spark.stop();
 	}
 	
-	protected String getJsonFile(String jsonType)
+	protected String getJsonFile(String jsonName)
 	{
 		
 		  String fileContent="";
-		  String path = CalculateControllerTest.class.getResource("/json/"+jsonType).getPath();
+		  String path = this.getClass().getResource("/json/"+jsonName).getPath();
 		  	  
 		try
 		{
@@ -71,12 +68,12 @@ public class TestBase
 		
 	}
 
-	protected TestResponse request(String method, String path, String body)
+	protected TestResponse request(String method, String path, String body,boolean isByteArray)
 	{
 
 		try
 		{
-			URL url = new URL("http://localhost:4567" + path);
+			URL url = new URL("http://localhost:4566" + path);
 			HttpURLConnection connection = (HttpURLConnection) url
 					.openConnection();
 			connection.setRequestMethod(method);
@@ -93,10 +90,20 @@ public class TestBase
 			os.write( outputInBytes );    
 			os.close();
 			}
-			String responseBody = IOUtils.toString(connection.getInputStream());
 			
-			return new TestResponse(connection.getResponseCode(), responseBody);
+			if(isByteArray)
+			{
+				byte[] responseBodyByteArray = IOUtils.toByteArray(connection.getInputStream());
+				return new TestResponse(connection.getResponseCode(), responseBodyByteArray);
+			}
+			else
+			{
+				String responseBody = IOUtils.toString(connection.getInputStream());
+				return new TestResponse(connection.getResponseCode(), responseBody);
+			}
 			
+			
+		
 
 		} catch (IOException e)
 		{
@@ -110,9 +117,16 @@ public class TestBase
 	protected static class TestResponse
 	{
 
+		public byte[] bodyByteArray;
 		public String body;
 		public int status;
 
+		public TestResponse(int status, byte[] body)
+		{
+			this.status = status;
+			this.bodyByteArray = body;
+		}
+		
 		public TestResponse(int status, String body)
 		{
 			this.status = status;
@@ -125,14 +139,16 @@ public class TestBase
 			
 		}
 
+		/*
 		public JsonObject json()
 		{
 
-			JsonObject data = Json.parse(body).asObject();
+		//	JsonObject data = Json.parse(body).asObject();
 
 			return data;
 		}
+		
+		*/
 	}
-	
 	
 }
