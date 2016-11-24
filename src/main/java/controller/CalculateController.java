@@ -4,6 +4,8 @@ import static spark.Spark.post;
 
 import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
+
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
@@ -18,7 +20,7 @@ import util.GeneralUtil;
 
 public class CalculateController
 {
-	
+	final static Logger logger = Logger.getLogger(CalculateController.class);
 	
 	public CalculateController()
 	{
@@ -26,14 +28,6 @@ public class CalculateController
 	
 		
 	//--------armo el api
-    	
-		
-		
-
-
-		
-		
-	
 	/*
     	
 		 get("/calculate/login", (request, response) -> 
@@ -100,7 +94,7 @@ public class CalculateController
 				workBookInfo.fileName = workBookItem.asObject().get("fileName").asString();
 				//ruta del excel
 				workBookInfo.path = Conf.spreadsheetPath+"/"+clientId+"/"+groupappId+"/"+workBookItem.asObject().get("fileName").asString();
-	           System.out.println("se busca el archivo... " + workBookInfo.path);
+				 logger.debug("se busca el archivo... " + workBookInfo.path);
 				workBookInfo.sheetsNames = GeneralUtil.getArrayString(workBookItem.asObject().get("sheetsNames").asArray());
 				
 			    arrWorkBookInfo.add(workBookInfo);
@@ -111,7 +105,7 @@ public class CalculateController
     		 excelManager.calculate();
     		 
     		 String jsonOutput = excelManager.resultData.toString();
-             System.out.println("json output :\n " + jsonOutput);
+    		 logger.debug("json output :\n " + jsonOutput);
              
     		 return  jsonOutput; 
     		}

@@ -73,7 +73,7 @@ public class TestBase
 
 		try
 		{
-			URL url = new URL("http://localhost:4567" + path);
+			URL url = new URL("http://localhost:4568" + path);
 			HttpURLConnection connection = (HttpURLConnection) url
 					.openConnection();
 			connection.setRequestMethod(method);
