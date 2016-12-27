@@ -1,10 +1,14 @@
 package main;
 
-public class ExcelToAppMain extends BaseMain {
+import java.io.IOException;
+
+public class ExcelToAppMain {
 	
 	//static Logger logger = Logger.getLogger(ExcelToAppMain.class);
-    public static void main(String[] args) {
-    	new Main();
+    public static void main(String[] args) throws IOException {
+    	
+			new Main();
+	
      }
     
 	

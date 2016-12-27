@@ -22,7 +22,7 @@ public class TestBase
 	
 	
 	@BeforeClass
-	public static void beforeClass()
+	public static void beforeClass() throws IOException
 	{
 		ExcelToAppMain.main(null);
 	}
