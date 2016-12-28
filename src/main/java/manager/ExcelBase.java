@@ -373,7 +373,7 @@ public class ExcelBase
 	
 	/**
 	 * devuelve cellData segun el CellName, este debe tener un formato
-	 * Libro!Sheet!CellRef donde Hoja1 es el nombre de la hoja y a1 es el nombre de la celda
+	 * Libro!Sheet!CellRef donde Sheet es el nombre de la hoja y CellRef es el nombre de la celda
 	 * @return
 	 */
 	private CellData getCellDataByCellName(String cellName)

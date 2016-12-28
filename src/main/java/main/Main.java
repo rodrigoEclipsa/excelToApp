@@ -39,7 +39,7 @@ public class Main
 		int minThreads = 2;
 		int timeOutMillis = 30000;
 		Spark.threadPool(maxThreads, minThreads, timeOutMillis);
-		Spark.port(4568);
+		Spark.port(Integer.parseInt(prop.getProperty("port")));
 
 		// ------------------------------
 
