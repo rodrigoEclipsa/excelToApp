@@ -61,24 +61,24 @@ un JSON simple podria lucir asi
 Analizamos propiedad por porpiedad
 
 ### head
-Es un objeto en el cual declararemos con que libros y hojas vamos a trabajar, estas se cargaran en memoria por lo que solamente declararemos solo aquellas que usaremos, también se tienen que incluir todos los archivos y hojas referenciados para poder satisfacer las dependencias. 
+Es un objeto en el cual declararemos con que libros y hojas vamos a trabajar, estas se cargaran en memoria por lo que unicamente declararemos solo aquellas que usaremos, también se tienen que incluir todos los archivos y hojas referenciados para poder satisfacer las dependencias. 
 
 **workBooks**
 Es un array de objetos en el cual cada objeto tiene 2 propiedades *fileName* el cual se establece el nombre del archivo y *sheetsNames* es un array en donde declaramos las hojas que usaremos de dicho archivo
 
 ### calculableVar
-calculableVar es un objeto que contendra las celdas las cuales queremos cambiar el valor, cada propiedad se define asi *"nombrearchivo!nombredelahoja!celda":valor*
+calculableVar es un objeto que contendrá las celdas las cuales queremos cambiar el valor, cada propiedad se define así *"nombrearchivo!nombredelahoja!celda":valor*
 
-> cada ves que queramos hacer una referencia a una celda en excelToApp utilizaremos el mismo formato nombrearchivo!nombredelahoja!celda noten que el signo ! es solo un caracter separador
+> cada ves que queramos referenciar una celda en excelToApp utilizaremos el mismo formato nombrearchivo!nombredelahoja!celda noten que el signo ! es solo un caracter separador
 
 ### requestResult
-Aqui definimos las celdas que queremos obtener en el JSON de salida, y definimos las celdas siempre con el mismo formato
+Aquí definimos las celdas que queremos obtener en el JSON de salida, y las definimos siempre con el mismo formato
 *"nombrearchivo!nombredelahoja!celda"*
 Si queremos obtener todas las celdas de calculo(aquellas que tienen formula) podemos usar la siguiente sintexis *"nombrearchivo!nombredelahoja!\*"*
 como ven se reemplaza el nombre de la celda por un *
 
 ## Estructura simple del JSON output
-El JSON que nos devuelve excelToApp puede variar según el JSON entrada pero por ejemplo en el JSON de entrada mensionado arriba lucira asi
+El JSON que nos devuelve excelToApp puede variar según el JSON entrada pero por ejemplo para el JSON de entrada mencionado arriba lucirá así
 
     {
       "calculateResult": {
@@ -116,11 +116,11 @@ excelToApp no tiene soporte nativo para tabla de datos, esta es una carencia que
     ]
 
 
-**evaluateFormula:**  en esta propiedad indicaremos la celda la cual contiena la formula que usara la tabla de datos
+**evaluateFormula:**  en esta propiedad indicaremos la celda la cual contiene la formula que usara la tabla de datos
  
  **cellInput0 y cellInput1:** en esta propiedad indicamos las celdas de entrada de la tabla, si es una sola entrada usaremos *cellInput0* si es de doble entrada usaremos ambas propiedades 
  
-**calculableVar:** en este array indicaremos objetos, en cada objeto se establecerá que los valores para *cellInput0* y *cellInput1* con las propiedades *input0* y *input1*, tendremos un objeto por cada celda de la tabla a*setResult* le daremos el valor de la celda de la tabla que contiene el resultado, esta propiedad es solo para que excelToApp sepa que en el JSON de salida tiene que devolvernes dicha celda con su respectivo resultado
+**calculableVar:** es un array de objetos, en cada objeto se establecerá los valores para *cellInput0* y *cellInput1* con las propiedades *input0* y *input1*, tendremos un objeto por cada celda de la tabla a*setResult* le daremos el valor de la celda de la tabla que contiene el resultado, esta propiedad es solo para que excelToApp sepa que en el JSON de salida tiene que devolvernos dicha celda con su respectivo resultado
 
 
 ### Funcion nInstances
@@ -153,7 +153,7 @@ imaginemos que tenemos un área en el excel en donde se resuelve determinado cal
        }
     ]
 
-lo que hace inInstances a grandes rasgos es ubicar las celdas que necesitemos informar del componente excel en columnas, entonces por ejemplo si elegimos conservar la celda *a1* y elegimos la columna *z* podemos decir que *z1* sera el valor de *a1* de la primera instancia, *z2* sera el valor de *a1* de la segunda instancia... y así sucesivamente, de esta forma el desarrollador excel tendrá a su disposición los valores que necesita para realizar su lógica de negocio, es necesario mencionar que las columnas elegidas en este caso la columna *z* debe quedar reservada solo para el uso de la funcionalidad *nInstances* para implementar esta funcionalidad con éxito es necesario coordinar con el desarrollador excel.
+lo que hace *nInstances* a grandes rasgos es ubicar las celdas que necesitemos informar del componente excel en columnas, entonces por ejemplo si elegimos conservar la celda *a1* y elegimos la columna *z* podemos decir que *z1* sera el valor de *a1* de la primera instancia, *z2* sera el valor de *a1* de la segunda instancia... y así sucesivamente, de esta forma el desarrollador excel tendrá a su disposición los valores que necesita para realizar su lógica de negocio, es necesario mencionar que las columnas elegidas en este caso la columna *z* debe quedar reservada solo para el uso de la funcionalidad *nInstances* para implementar esta funcionalidad con éxito es necesario coordinar con el desarrollador excel.
 
 **nInstances:** es un array de objetos en donde cada objeto representa la configuración de cada componente excel
 
