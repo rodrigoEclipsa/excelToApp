@@ -70,15 +70,15 @@ public class CalculateController
     	  * http://localhost:4567/calculate/1/1/Margenbrutoganadero18meses.xls/dcria
     	  * 
     	  */
-    	 post("/calculate/:client_id/:groupapp_id", (request, response) -> 
+    	 post("/calculate/:clientId/:groupappId", (request, response) -> 
     	 {
     		 
     		try
     		{
           
              //---------------------------
-    		 String clientId = request.params(":client_id");
-    		 String groupappId = request.params(":groupapp_Id");
+    		 String clientId = request.params(":clientId");
+    		 String groupappId = request.params(":groupappId");
     		
     		 JsonObject data =  Json.parse(request.body()).asObject();
     		
