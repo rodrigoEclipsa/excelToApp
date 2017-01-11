@@ -4,6 +4,9 @@ El API usa spark Framewok [spark](http://sparkjava.com/) y maven. para utilizarl
 
 ![Arquitectura excelToApp](https://github.com/rodrigoEclipsa/excelToApp/blob/master/excelToApp%20API.png?raw=true)
 
+
+[visite nuestro canal canal de youtube](https://youtu.be/e992VOtjUU8?list=PLFG6l-xorw6p5Ko9JmkekBNYBYkCDR7tD) 
+
 ## configuracion
 El proyecto cuenta con un archivo de configuracion conf/config.properties que posee las propiedades
 * **spreadsheetPath:** es la ruta base en donde se almacenan las hojas de calculo. estas deben estar almacenadas en un orden determinado para que la sistema trabaje con el archivo correcto, el orden es rootFolder/clientId/groupId/excel.xls donde rootFolder es *spreadsheetPath*, clientId es cualquier identificador de nuestro cliente(desarrollador excel) y groupId es cualquier identificador de la aplicación que realizaremos. la url para la solicitud REST lucirá así *midominio.com:port/calculate/clientId/groupappId*, de esta manera lograremos una estructura de directorio ordenada, tengan en cuenta que en muchas ocasiones una única aplicación puede estar compuesta por múltiples hojas de calculo *clientId y groupId son identificadores cualquiera que usted desee asignar*
