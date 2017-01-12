@@ -1,6 +1,6 @@
 # excelToApp
 excelToApp es un API construida sobre Apache POI que permite reutilizar la logica de negocio construida con excel para crear aplicaciones, posee soporte para múltiples libros y hojas, ademas se incorporaron funciones de alto nivel sobre el API que permiten ir mas allá de la resolución de cálculos.
-El API usa spark Framewok [spark](http://sparkjava.com/) y maven. para utilizarlo solo descargue el proyecto .jar, ejecutarlo y enviar su solicitud por el puerto 4568.
+El API usa [spark Framewok](http://sparkjava.com/) y maven. para utilizarlo solo descargue el proyecto .jar, ejecutarlo y enviar su solicitud por el puerto 4568.
 
 ![Arquitectura excelToApp](https://github.com/rodrigoEclipsa/excelToApp/blob/master/excelToApp%20API.png?raw=true)
 
@@ -9,7 +9,7 @@ El API usa spark Framewok [spark](http://sparkjava.com/) y maven. para utilizarl
 
 ## configuracion
 El proyecto cuenta con un archivo de configuracion conf/config.properties que posee las propiedades
-* **spreadsheetPath:** es la ruta base en donde se almacenan las hojas de calculo. estas deben estar almacenadas en un orden determinado para que la sistema trabaje con el archivo correcto, el orden es rootFolder/clientId/groupId/excel.xls donde rootFolder es *spreadsheetPath*, clientId es cualquier identificador de nuestro cliente(desarrollador excel) y groupId es cualquier identificador de la aplicación que realizaremos. la url para la solicitud REST lucirá así *midominio.com:port/calculate/clientId/groupappId*, de esta manera lograremos una estructura de directorio ordenada, tengan en cuenta que en muchas ocasiones una única aplicación puede estar compuesta por múltiples hojas de calculo *clientId y groupId son identificadores cualquiera que usted desee asignar*
+* **spreadsheetPath:** es la ruta base en donde se almacenan las hojas de calculo. estas deben estar almacenadas en un orden determinado para que la sistema trabaje con el archivo correcto, el orden es rootFolder/clientId/groupId/excel.xls donde rootFolder es *spreadsheetPath*, clientId es cualquier identificador de nuestro cliente(desarrollador excel) y groupId es cualquier identificador de la aplicación que realizaremos, la url para la solicitud REST lucirá así *midominio.com:port/calculate/clientId/groupappId*,el JSON que enviemos en el cuerpo de la solicitud se encargara de establecer que archivos se usaran. de esta manera lograremos una estructura de directorio ordenada, tengan en cuenta que en muchas ocasiones una única aplicación puede estar compuesta por múltiples hojas de calculo *clientId y groupId son identificadores cualquiera que usted desee asignar*
 * **log4jPath:** es la ruta hacia el archivo log4j.properties, pude configurar log4j.properties como lo desee.
 * **port:** El puerto que utilizara el servicio por defecto es 4567.
 
