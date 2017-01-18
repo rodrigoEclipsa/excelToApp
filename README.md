@@ -77,8 +77,9 @@ calculableVar es un objeto que contendrá las celdas las cuales queremos cambiar
 ### requestResult
 Aquí definimos las celdas que queremos obtener en el JSON de salida, y las definimos siempre con el mismo formato
 *"nombrearchivo!nombredelahoja!celda"*
-Si queremos obtener todas las celdas de calculo(aquellas que tienen formula) podemos usar la siguiente sintexis *"nombrearchivo!nombredelahoja!\*"*
+Si queremos obtener todas las celdas de calculo(aquellas que tienen formula) podemos usar la siguiente sintexis *nombrearchivo!nombredelahoja!**
 como ven se reemplaza el nombre de la celda por un *
+Si queremos obtener los valores de un rango de celdas debemos escribir la cordenada del rango por ejemplo *nombrearchivo!nombredelahoja!a9:d10*, entonces obtendremos un array con todos los valores y la propiedad tendra el nombre del rando en este caso *a9:d10*
 
 ## Estructura simple del JSON output
 El JSON que nos devuelve excelToApp puede variar según el JSON entrada pero por ejemplo para el JSON de entrada mencionado arriba lucirá así
