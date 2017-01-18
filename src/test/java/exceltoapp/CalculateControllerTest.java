@@ -48,7 +48,7 @@ public class CalculateControllerTest extends TestBase
 
 	}
 	
-	/*
+	
 	@Test
 	public void econoagro_efectoPalanca() throws IOException
 	{
@@ -64,9 +64,9 @@ public class CalculateControllerTest extends TestBase
 		 assertEquals(200, res.status);
 	
 	}
-*/
+
 	
-	/*
+	
 	@Test
 	public void econoagro_feedLotCompra() throws IOException
 	{
@@ -83,10 +83,10 @@ public class CalculateControllerTest extends TestBase
 	
 	}
 	
-	*/
 	
 	
-	/*
+	
+	
 	@Test
 	public void dataTableCalculate() throws IOException
 	{
@@ -105,11 +105,11 @@ public class CalculateControllerTest extends TestBase
 
 	
 	}
-*/
+
 	
 	
 	
-	/*
+	
 	@Test
 	public void bigCalculate() throws IOException
 	{
@@ -128,8 +128,8 @@ public class CalculateControllerTest extends TestBase
 		  		assertEquals(200, res.status);
 
 	}
-	*/
-	/*
+	
+	
 	@Test
 	public void dFunctionsCalculate() throws IOException
 	{
@@ -149,6 +149,6 @@ public class CalculateControllerTest extends TestBase
 
 	}
 	
-	*/
+
 
 }
