@@ -4,8 +4,14 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.ss.util.CellReference;
 
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
@@ -14,12 +20,16 @@ import com.eclipsesource.json.JsonValue;
 
 import classes.CellData;
 import classes.WorkBookInfo;
+import classes.WorkBookObject;
+import conf.Conf;
 import util.GeneralUtil;
 
 
 public class ExcelManager extends ExcelBase
 {
 
+	final static Logger logger = Logger.getLogger(ExcelManager.class);
+	
 	private JsonObject sentData;
 	public JsonObject resultData = new JsonObject();
 
@@ -107,7 +117,7 @@ public class ExcelManager extends ExcelBase
 			   else
 			   {
 				   //si esta vacio igual genero el objeto(vacio)
-				   resultData.add("calculateResult", getResult(requestResult));	   
+				  // resultData.add("calculateResult", getResult(requestResult));	   
 			   }
 			
 			
@@ -454,16 +464,56 @@ public class ExcelManager extends ExcelBase
 	{
 
 		JsonObject calculateResult = new JsonObject();
-
+		CellData cellData;
 		// recorro todas las celdas que se requieren obtener
 		for (JsonValue requestResultItem : requestResult)
 		{
-
-			CellData cellData = this.getCellData(requestResultItem.asString());
+			//verifico si el valor es un rango o una celda..
+			String[] cellNameSplit = requestResultItem.asString().split(Conf.splitStr);
+			String workBookName = cellNameSplit[0];
+			String sheetName = cellNameSplit[1];
+			String cellName = cellNameSplit[2];
+			
+			String[] cellNameRange = cellName.split(":");
+			//si es un rango lo proceso como tal
+			if(cellNameRange.length > 1)
+			{
+				
+				WorkBookObject workBookObject = getWorkBookObjectByName(workBookName);
+				Sheet sheet = workBookObject.sheets.get(sheetName);
+				
+				CellReference cellReference;
+				CellRangeAddress range = CellRangeAddress.valueOf(cellName);
+				JsonArray calculateResultRange = new JsonArray();
+				for (int i=range.getFirstRow(); i<=range.getLastRow(); i++)
+				{
+					 Row r = sheet.getRow(i);
+					 
+					 for (Cell c : r) 
+				     {
+						 cellReference = new CellReference(c);
+						 //logger.debug(cellReference.formatAsString());
+						 String cellNameOrigin = workBookName+Conf.splitStr+sheetName+Conf.splitStr+cellReference.formatAsString();
+						 cellData = this.getCellData(cellNameOrigin);
+						 setValidTypeJsonArray(requestResultItem.asString(),calculateResultRange,cellData.value);
+						 
+				     }
+					 
+				}
+				
+				calculateResult.add(cellName, calculateResultRange);
+				
+			}
+			else
+			{
+			
+			
+			cellData = this.getCellData(requestResultItem.asString());
 			setValidTypeJson(requestResultItem.asString(),calculateResult,cellData.value);
 			
-		
 			//System.out.println(requestResultItem.toString() + " : " + cellValue.value);
+			
+			}
 			
 		}
 
@@ -471,7 +521,7 @@ public class ExcelManager extends ExcelBase
 	}
 	
 	/**
-	 * setea un json con formato valido a un jsonObject
+	 * asigna valores JSON validos a un jsonObject
 	 * @param cellRef
 	 * @param jsonObject
 	 * @param value
@@ -495,6 +545,36 @@ public class ExcelManager extends ExcelBase
 		else
 		{
 			jsonObject.set(cellRef, value);
+		}
+		
+	}
+	
+	/**
+	 * asigna valores JSON validos a un jsonArray
+	 * @param cellRef
+	 * @param jsonArray
+	 * @param value
+	 */
+	private void setValidTypeJsonArray(String cellRef,JsonArray jsonArray, String value)
+	{
+		int jsonValidType = jsonValidType(value);
+		
+		if(jsonValidType == JSON_STRING)
+		{
+			
+			jsonArray.add(value);
+		}
+		else if(jsonValidType == JSON_NUMBER)
+		{
+			jsonArray.add(Double.parseDouble(value));
+		}
+		else if(jsonValidType == JSON_BOOLEAN)
+		{
+			jsonArray.add(Boolean.getBoolean(value));
+		}
+		else
+		{
+			jsonArray.add(value);
 		}
 		
 	}

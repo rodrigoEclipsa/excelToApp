@@ -40,7 +40,9 @@
 
 "simpleCalculate0.xlsx!Hoja1!a3",
 "simpleCalculate0.xlsx!Hoja2!a4",
-"simpleCalculate1.xlsx!Hoja1!a1"
+"simpleCalculate1.xlsx!Hoja1!a1",
+
+"simpleCalculate0.xlsx!Hoja1!a9:d10"
 ]
 
 

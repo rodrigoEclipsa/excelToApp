@@ -243,7 +243,7 @@ public class ExcelBase
 
 	protected CellData getCellData(String cellName) 
 	{
-
+		
 		CellData cellData = getCellDataByCellName(cellName);
 
 		return getCellValue(cellData);
@@ -353,7 +353,7 @@ public class ExcelBase
 	 * @param name
 	 * @return
 	 */
-	private WorkBookObject getWorkBookObjectByName(String name)
+	protected WorkBookObject getWorkBookObjectByName(String name)
 	{
 		WorkBookObject result = null;
 		for (WorkBookObject workBookObjectItem : arrWorkBookObject)
