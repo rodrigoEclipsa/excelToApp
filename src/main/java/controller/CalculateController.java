@@ -112,8 +112,9 @@ public class CalculateController
     		catch(Exception error)
     		{
     			error.printStackTrace();
-    			
-    			return "se produjo un error";
+    			 logger.error(error.getMessage());
+    			 throw error;
+    			//return "se produjo un error";
     			
     		}
     		 

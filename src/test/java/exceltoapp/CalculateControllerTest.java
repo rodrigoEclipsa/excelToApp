@@ -105,7 +105,6 @@ public class CalculateControllerTest extends TestBase
 
 	
 	}
-
 	
 	
 	
@@ -129,7 +128,7 @@ public class CalculateControllerTest extends TestBase
 
 	}
 	
-	
+	/*
 	@Test
 	public void dFunctionsCalculate() throws IOException
 	{
@@ -148,7 +147,7 @@ public class CalculateControllerTest extends TestBase
 		  		assertEquals(200, res.status);
 
 	}
-	
+	*/
 
 
 }

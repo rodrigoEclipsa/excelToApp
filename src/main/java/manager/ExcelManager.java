@@ -116,8 +116,8 @@ public class ExcelManager extends ExcelBase
 			   }
 			   else
 			   {
-				   //si esta vacio igual genero el objeto(vacio)
-				  // resultData.add("calculateResult", getResult(requestResult));	   
+				   //si esta vacio igual genero el objeto(vacio), se requiere en otros estados
+				   resultData.add("calculateResult", getResult(requestResult));	   
 			   }
 			
 			
