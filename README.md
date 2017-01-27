@@ -168,3 +168,7 @@ lo que hace *nInstances* a grandes rasgos es ubicar las celdas que necesitemos i
 **requestResult:**es un array en donde se declaran las celdas de calculo(aquellas que resuelven un calculo) que queremos obtener por cada instancia, se da por echo que en todas las instancias se necesitaran obtener las mismas celdas de calculo
 
 **resultAfterNinstances:** es un array en donde se declaran las celdas que queremos obtener(generalmente celdas de calculo) despues de que se hallan mapeado todos los resultados en sus respectivas columnas, es decir que una ves mapeado todos los resultados excelToApp esta listo para obtener aquellas celdas que en sus calculos dependen de los valores de todas las instancias de los componentes
+
+###contacto:
+**email:** rodrigo.eclipsa@gmail.com
+**skype:** rodrigo_eclipsa
