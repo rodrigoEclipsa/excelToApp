@@ -171,5 +171,4 @@ lo que hace *nInstances* a grandes rasgos es ubicar las celdas que necesitemos i
 
 ###contacto:
 **email:** rodrigo.eclipsa@gmail.com
-
 **skype:** rodrigo_eclipsa
