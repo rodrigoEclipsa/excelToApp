@@ -106,18 +106,18 @@ public class ExcelManager extends ExcelBase
 				
 				if(cellName.equals("*"))
 				{
-					resultData.add("calculateResult", getResult(getAllFormulaCell(fileName, sheetName)));	
+					resultData.add("calculatedResult", getResult(getAllFormulaCell(fileName, sheetName)));	
 				}
 				else
 				{
-					resultData.add("calculateResult", getResult(requestResult));	
+					resultData.add("calculatedResult", getResult(requestResult));	
 				}
 			   
 			   }
 			   else
 			   {
 				   //si esta vacio igual genero el objeto(vacio), se requiere en otros estados
-				   resultData.add("calculateResult", getResult(requestResult));	   
+				   resultData.add("calculatedResult", getResult(requestResult));	   
 			   }
 			
 			
@@ -147,17 +147,17 @@ public class ExcelManager extends ExcelBase
 			if(sentData.get("dataTable") != null)
 			{
 			
-				if(resultData.get("calculateResult") == null)
+				if(resultData.get("calculatedResult") == null)
 				{
-					JsonArray calculateResult = new JsonArray();
-					resultData.add("calculateResult", calculateResult);
+					JsonArray calculatedResult = new JsonArray();
+					resultData.add("calculatedResult", calculatedResult);
 				}
 				
-				getResultDataTable(resultData.get("calculateResult").asObject());
+				getResultDataTable(resultData.get("calculatedResult").asObject());
 					
 				//JsonObject dataTable = new JsonObject();
 				
-			//	dataTable.add("calculateResult",getResultDataTable());
+			//	dataTable.add("calculatedResult",getResultDataTable());
 				
 			   // resultData.add("dataTable", dataTable);
 			
@@ -259,7 +259,7 @@ public class ExcelManager extends ExcelBase
     * @return
     * devuelve un objeto que reprecenta todos los resultados de las tablas de datos
     */
-	private void getResultDataTable(JsonObject calculateResult)
+	private void getResultDataTable(JsonObject calculatedResult)
 	{
 
 		JsonArray dataTable =  sentData.get("dataTable").asArray();
@@ -326,7 +326,7 @@ public class ExcelManager extends ExcelBase
 			}
 			}
 				
-			calculateResult.add(calculableVarItemObj.get("setResult").asString()
+			calculatedResult.add(calculableVarItemObj.get("setResult").asString()
 					, getCellData(evaluateFormula).value);
 			
 			
@@ -356,7 +356,7 @@ public class ExcelManager extends ExcelBase
 
 		JsonArray resultComponents = new JsonArray();
 		JsonObject resultObj;
-     	JsonArray calculateResult;
+     	JsonArray calculatedResult;
 
 		JsonArray nInstances = sentData.get("nInstances").asArray();
 
@@ -369,7 +369,7 @@ public class ExcelManager extends ExcelBase
 		for (JsonValue nInstancesItem : nInstances)
 		{
 		
-		 calculateResult = new JsonArray();
+		 calculatedResult = new JsonArray();
 		
 		 calculableVar = nInstancesItem.asObject().get("calculableVar").asArray();
 
@@ -395,6 +395,7 @@ public class ExcelManager extends ExcelBase
 				//aumento el numero de fila
 				indicateRowMap++;
 				
+				
 				//asigno resultado a las columnas
 				for (Member mapResultColumnKey : mapResultColumn)
 				{
@@ -419,12 +420,12 @@ public class ExcelManager extends ExcelBase
 
 			}
 
-			calculateResult.add(getResult);
+			calculatedResult.add(getResult);
 
 		}
 
 		resultObj = new JsonObject(); 
-		resultObj.add("calculateResult", calculateResult);
+		resultObj.add("calculatedResult", calculatedResult);
 		
 		//resulevo los calculos luego de que se hallan mapeado los datos
         JsonArray resultAfterNinstances = nInstancesItem.asObject().get("resultAfterNinstances").asArray();
@@ -463,7 +464,7 @@ public class ExcelManager extends ExcelBase
 	private JsonObject getResult(JsonArray requestResult) 
 	{
 
-		JsonObject calculateResult = new JsonObject();
+		JsonObject calculatedResult = new JsonObject();
 		CellData cellData;
 		// recorro todas las celdas que se requieren obtener
 		for (JsonValue requestResultItem : requestResult)
@@ -484,7 +485,7 @@ public class ExcelManager extends ExcelBase
 				
 				CellReference cellReference;
 				CellRangeAddress range = CellRangeAddress.valueOf(cellName);
-				JsonArray calculateResultRange = new JsonArray();
+				JsonArray calculatedResultRange = new JsonArray();
 				for (int i=range.getFirstRow(); i<=range.getLastRow(); i++)
 				{
 					 Row r = sheet.getRow(i);
@@ -495,13 +496,13 @@ public class ExcelManager extends ExcelBase
 						 //logger.debug(cellReference.formatAsString());
 						 String cellNameOrigin = workBookName+Conf.splitStr+sheetName+Conf.splitStr+cellReference.formatAsString();
 						 cellData = this.getCellData(cellNameOrigin);
-						 setValidTypeJsonArray(requestResultItem.asString(),calculateResultRange,cellData.value);
+						 setValidTypeJsonArray(requestResultItem.asString(),calculatedResultRange,cellData.value);
 						 
 				     }
 					 
 				}
 				
-				calculateResult.add(cellName, calculateResultRange);
+				calculatedResult.add(cellName, calculatedResultRange);
 				
 			}
 			else
@@ -509,7 +510,7 @@ public class ExcelManager extends ExcelBase
 			
 			
 			cellData = this.getCellData(requestResultItem.asString());
-			setValidTypeJson(requestResultItem.asString(),calculateResult,cellData.value);
+			setValidTypeJson(requestResultItem.asString(),calculatedResult,cellData.value);
 			
 			//System.out.println(requestResultItem.toString() + " : " + cellValue.value);
 			
@@ -517,7 +518,7 @@ public class ExcelManager extends ExcelBase
 			
 		}
 
-		return calculateResult;
+		return calculatedResult;
 	}
 	
 	/**
@@ -582,7 +583,7 @@ public class ExcelManager extends ExcelBase
 	private JsonObject getResult(ArrayList<String> requestResult) 
 	{
 
-		JsonObject calculateResult = new JsonObject();
+		JsonObject calculatedResult = new JsonObject();
 
 		// recorro todas las celdas que se requieren obtener
 		for (String requestResultItem : requestResult)
@@ -590,13 +591,13 @@ public class ExcelManager extends ExcelBase
 
 			CellData cellData = this.getCellData(requestResultItem);
 			
-			setValidTypeJson(requestResultItem,calculateResult,cellData.value);
+			setValidTypeJson(requestResultItem,calculatedResult,cellData.value);
 
 			//System.out.println(requestResultItem.toString() + " : " + cellValue.value);
 			
 		}
 
-		return calculateResult;
+		return calculatedResult;
 	}
 
 
