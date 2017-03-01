@@ -85,13 +85,13 @@ Si queremos obtener los valores de un rango de celdas debemos escribir la corden
 El JSON que nos devuelve excelToApp puede variar según el JSON entrada pero por ejemplo para el JSON de entrada mencionado arriba lucirá así
 
     {
-      "calculateResult": {
+      "calculatedResult": {
         "simpleCalculate0.xlsx!Hoja1!a3": valor,
         "simpleCalculate0.xlsx!Hoja2!a4": valor,
         "simpleCalculate1.xlsx!Hoja1!a1": valor
       }
     }
-como ven el objeto calculateResult contiene el valor de las celdas que solicitamos en requestResult.
+como ven el objeto calculatedResult contiene el valor de las celdas que solicitamos en requestResult.
 
 ## Funciones especiales
 Hasta aquí hemos visto las funcionalidades esenciales de excelToApp que básicamente se trata de cambiar valores a celdas y obtener resultados, ahora veremos algunas funciones especiales que hace que excelToApp sea mas genial aun.
